@@ -1,0 +1,12 @@
+{
+  "domain": "jules",
+  "name": "Jules Agent",
+  "codeowners": ["@jules"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jules/homeassistant-jules",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jules/homeassistant-jules/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}
