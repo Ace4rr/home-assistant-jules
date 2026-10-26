@@ -1,12 +1,12 @@
 {
   "domain": "jules",
   "name": "Jules Agent",
-  "codeowners": ["@jules"],
+  "codeowners": ["@Ace4rr"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/jules/homeassistant-jules",
+  "documentation": "https://github.com/Ace4rr/home-assistant-jules",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/jules/homeassistant-jules/issues",
+  "issue_tracker": "https://github.com/Ace4rr/home-assistant-jules/issues",
   "requirements": [],
   "version": "1.0.0"
 }
