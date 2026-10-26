@@ -2,51 +2,58 @@ class JulesAgentCard extends HTMLElement {
   set hass(hass) {
     if (!this.content) {
       const card = document.createElement('ha-card');
-      card.header = 'Jules Agent';
+      card.style.background = '#151515';
+      card.style.borderRadius = '12px';
+      card.style.color = '#e0e0e0';
+      card.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+
       this.content = document.createElement('div');
 
-      // Inline styles for a clean, modern look matching Jules
       const style = document.createElement('style');
       style.textContent = `
-        .jules-container {
+        .jules-sessions-container {
           padding: 16px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
         }
-        .status-row {
+        .jules-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 14px;
+          color: #a0a0a0;
+          margin-bottom: 12px;
+          padding-left: 8px;
+        }
+        .session-item {
           display: flex;
           align-items: center;
-          gap: 8px;
-        }
-        .status-indicator {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background-color: #721c24; /* default offline */
-        }
-        .status-indicator.working {
-          background-color: #28a745;
-          box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
-        }
-        .status-text {
-          font-weight: bold;
-          text-transform: capitalize;
-        }
-        .task-container {
-          background-color: var(--secondary-background-color, #f4f4f4);
-          padding: 12px;
+          padding: 12px 16px;
           border-radius: 8px;
-          font-family: monospace;
-          color: var(--primary-text-color);
+          margin-bottom: 4px;
+          gap: 12px;
         }
-        .actions-row {
+        .session-item.active {
+          background-color: #2a2a35;
+        }
+        .session-icon {
           display: flex;
-          gap: 8px;
-          margin-top: 8px;
+          align-items: center;
+          justify-content: center;
+          color: #7c7c8a; /* Assuming gray for completed/inactive */
         }
-        .actions-row mwc-button {
+        .session-item.active .session-icon {
+          color: #8b949e; /* Placeholder, screenshot shows gray checkmark for active too */
+        }
+        .session-title {
           flex: 1;
+          font-size: 15px;
+          font-weight: 500;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .session-dots {
+          color: #8b949e;
+          cursor: pointer;
         }
       `;
 
@@ -55,8 +62,6 @@ class JulesAgentCard extends HTMLElement {
       this.appendChild(card);
     }
 
-    // Get sensor states (assuming these entity IDs based on our python code)
-    // Note: in a real environment the exact entity_id might have a suffix if multiple exist
     const statusEntityId = 'sensor.jules_agent_status';
     const taskEntityId = 'sensor.jules_current_task';
 
@@ -66,39 +71,64 @@ class JulesAgentCard extends HTMLElement {
     const statusStr = statusState ? statusState.state : 'Unknown';
     const taskStr = taskState ? taskState.state : 'No active task';
 
-    const isWorking = statusStr.toLowerCase() === 'working';
-
     this.content.innerHTML = `
-      <div class="jules-container">
-        <div class="status-row">
-          <div class="status-indicator ${isWorking ? 'working' : ''}"></div>
-          <div class="status-text">Status: ${statusStr}</div>
+      <div class="jules-sessions-container">
+        <div class="jules-header">
+          <span>Recent sessions</span>
+          <ha-icon icon="mdi:chevron-up" style="--mdc-icon-size: 20px;"></ha-icon>
         </div>
 
-        <div>Current Task:</div>
-        <div class="task-container">
-          ${taskStr}
+        <div class="session-item active">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">${taskStr}</div>
+          <div class="session-dots">
+            <ha-icon icon="mdi:dots-horizontal" style="--mdc-icon-size: 20px;"></ha-icon>
+          </div>
         </div>
 
-        <div class="actions-row">
-          <!-- Placeholders for future interactivity -->
-          <mwc-button raised label="Pause" icon="mdi:pause" ${!isWorking ? 'disabled' : ''}></mwc-button>
-          <mwc-button raised label="Stop" icon="mdi:stop" ${!isWorking ? 'disabled' : ''}></mwc-button>
-          <mwc-button outlined label="New Task" icon="mdi:plus"></mwc-button>
+        <div class="session-item">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">Очистка проекта и обновление...</div>
+          <div class="session-dots"></div>
+        </div>
+
+        <div class="session-item">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">Исправление ошибки версии и...</div>
+          <div class="session-dots"></div>
+        </div>
+
+        <div class="session-item">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">README в стиле Meshtastic Ho...</div>
+          <div class="session-dots"></div>
+        </div>
+
+        <div class="session-item">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">Интеграция панели агентов Jul...</div>
+          <div class="session-dots"></div>
+        </div>
+
+        <div class="session-item">
+          <div class="session-icon">
+            <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
+          </div>
+          <div class="session-title">Удаление водяных знаков Z.ai и...</div>
+          <div class="session-dots"></div>
         </div>
       </div>
     `;
-
-    // Add event listeners for placeholder buttons (for future implementation)
-    const buttons = this.content.querySelectorAll('mwc-button');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const action = e.target.getAttribute('label');
-        console.log(`Action ${action} triggered! Future API integration goes here.`);
-        // Example of calling a HA service in the future:
-        // hass.callService('jules', 'send_command', { command: action.toLowerCase() });
-      });
-    });
   }
 
   setConfig(config) {
@@ -109,7 +139,7 @@ class JulesAgentCard extends HTMLElement {
   }
 
   getCardSize() {
-    return 3;
+    return 6; // Adjusted size based on the list
   }
 }
 
