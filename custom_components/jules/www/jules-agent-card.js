@@ -1,5 +1,7 @@
 class JulesAgentCard extends HTMLElement {
   set hass(hass) {
+    if (!hass || !hass.states) return;
+
     if (!this.content) {
       const card = document.createElement('ha-card');
       card.style.background = '#151515';
@@ -59,19 +61,7 @@ class JulesAgentCard extends HTMLElement {
 
       card.appendChild(style);
       card.appendChild(this.content);
-      this.appendChild(card);
-    }
-
-    const statusEntityId = 'sensor.jules_agent_status';
-    const taskEntityId = 'sensor.jules_current_task';
-
-    const statusState = hass.states[statusEntityId];
-    const taskState = hass.states[taskEntityId];
-
-    const statusStr = statusState ? statusState.state : 'Unknown';
-    const taskStr = taskState ? taskState.state : 'No active task';
-
-    this.content.innerHTML = `
+        this.content.innerHTML = `
       <div class="jules-sessions-container">
         <div class="jules-header">
           <span>Recent sessions</span>
@@ -82,7 +72,7 @@ class JulesAgentCard extends HTMLElement {
           <div class="session-icon">
             <ha-icon icon="mdi:check-circle-outline" style="--mdc-icon-size: 18px;"></ha-icon>
           </div>
-          <div class="session-title">${taskStr}</div>
+          <div class="session-title" id="active-task-title"></div>
           <div class="session-dots">
             <ha-icon icon="mdi:dots-horizontal" style="--mdc-icon-size: 20px;"></ha-icon>
           </div>
@@ -129,7 +119,25 @@ class JulesAgentCard extends HTMLElement {
         </div>
       </div>
     `;
-  }
+      this.appendChild(card);
+    }
+
+    const statusEntityId = 'sensor.jules_agent_status';
+    const taskEntityId = 'sensor.jules_current_task';
+
+    const statusState = hass.states[statusEntityId];
+    const taskState = hass.states[taskEntityId];
+
+    const statusStr = statusState ? statusState.state : 'Unknown';
+    const taskStr = taskState ? taskState.state : 'No active task';
+
+
+
+    if (this.content) {
+      const activeTitle = this.content.querySelector("#active-task-title");
+      if (activeTitle) activeTitle.textContent = taskStr;
+    }
+}
 
   setConfig(config) {
     if (!config) {
