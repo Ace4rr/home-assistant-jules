@@ -46,13 +46,11 @@ Supported Features:
 
 To add the Jules Agent Card to your Lovelace dashboard:
 
-1. Copy the `jules-agent-card.js` file to your Home Assistant `www` folder (`/config/www/jules-agent-card.js`).
-   *(If you installed via HACS, it may already be available at `/hacsfiles/home-assistant-jules/jules-agent-card.js` or similar).*
-2. In Home Assistant, go to **Settings** -> **Dashboards** -> **Resources** (or three dots -> Manage resources on your dashboard).
-3. Click **Add Resource**.
-4. Set the URL to `/local/jules-agent-card.js` (or the HACS path).
-5. Set Resource type to **JavaScript Module**.
-6. Refresh your browser or the Home Assistant companion app.
+1. In Home Assistant, go to **Settings** -> **Dashboards** -> **Resources** (or three dots -> Manage resources on your dashboard).
+2. Click **Add Resource**.
+3. Set the URL to `/jules_local/jules-agent-card.js` (this path is automatically provided by the integration, no need to copy files manually).
+4. Set Resource type to **JavaScript Module**.
+5. Refresh your browser or the Home Assistant companion app.
 
 Now, you can add a manual card to your dashboard with the following YAML configuration:
 
