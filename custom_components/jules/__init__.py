@@ -12,7 +12,13 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Jules Agent from a config entry."""
     hass.data.setdefault(DOMAIN, {})
-    hass.http.register_static_path('/jules_local', hass.config.path('custom_components/jules/www'), cache_headers=True)
+    if hasattr(hass.http, "async_register_static_paths"):
+        from homeassistant.components.http import StaticPathConfig
+        hass.http.async_register_static_paths([
+            StaticPathConfig("/jules_local", hass.config.path("custom_components/jules/www"), cache_headers=True)
+        ])
+    else:
+        hass.http.register_static_path('/jules_local', hass.config.path('custom_components/jules/www'), cache_headers=True)
 
     # Здесь в будущем будет инициализация API клиента и Coordinator
     # hass.data[DOMAIN][entry.entry_id] = coordinator
