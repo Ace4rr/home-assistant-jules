@@ -14,11 +14,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     if hasattr(hass.http, "async_register_static_paths"):
         from homeassistant.components.http import StaticPathConfig
-        hass.http.async_register_static_paths([
-            StaticPathConfig("/jules_local", hass.config.path("custom_components/jules/www"), cache_headers=True)
+        await hass.http.async_register_static_paths([
+            StaticPathConfig("/jules_local", hass.config.path("custom_components/jules/www"), cache_headers=False)
         ])
     else:
-        hass.http.register_static_path('/jules_local', hass.config.path('custom_components/jules/www'), cache_headers=True)
+        hass.http.register_static_path('/jules_local', hass.config.path('custom_components/jules/www'), cache_headers=False)
 
     # Здесь в будущем будет инициализация API клиента и Coordinator
     # hass.data[DOMAIN][entry.entry_id] = coordinator
