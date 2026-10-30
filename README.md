@@ -9,13 +9,12 @@
 _Home Assistant Integration for Jules Agent._
 
 Supported Features:
- * Native backend integration (Python) communicating with official Jules REST API.
- * Translates Jules agent data into standard Home Assistant entities (e.g., `sensor.jules_agent_status`, `sensor.jules_current_task`).
- * Custom Lovelace Card (LitElement) for beautiful visualization of agent status, progress, and task description.
+ * Native backend integration (Python) communicating with the official Jules REST API (v1alpha, `jules.googleapis.com`).
+ * Jules-style Lovelace card: sidebar with the logo, search, recent sessions and codebases; repo page with task input, suggestions, sessions and scheduled tasks; openable chat view with the "Talk to Jules" input.
+ * Standard HA entities: `sensor.jules_agent_status`, `sensor.jules_current_task`, `sensor.jules_sessions` (sessions + codebases as attributes), `sensor.jules_chat` (opened chat messages).
+ * Services: `jules.load_chat`, `jules.send_message`, `jules.create_session` — the card wires them to chat opening, the chat input and the task input.
  * Safe storage of API keys on the server side.
  * Seamless configuration via Home Assistant UI (Config Flow), no YAML editing required.
- * Automate based on agent statuses (e.g., trigger notifications when an agent finishes a task).
- * Supports polling or websocket constant connection (depending on API capabilities).
 
 ## Installation
 
@@ -62,11 +61,30 @@ type: custom:jules-agent-card
 
 | Option | Default | Description |
 |---|---|---|
-| `title` | `Recent sessions` | Card header text |
-| `url` | `https://jules.google.com` | Link opened when clicking a session or "Open in Jules" |
-| `status_entity` | `sensor.jules_agent_status` | Entity used for the active-session status icon |
-| `task_entity` | `sensor.jules_current_task` | Entity used for the active-session title |
-| `sessions` | sample list | Extra rows under the active session: `[{title: "...", status: "done|active|attention"}]` |
+| `url` | `https://jules.google.com` | Base link used by "Open in Jules" and session deep links |
+| `sessions_entity` | `sensor.jules_sessions` | Entity with `sessions` and `sources` attributes |
+| `chat_entity` | `sensor.jules_chat` | Entity with the opened chat messages |
+| `status_entity` | `sensor.jules_agent_status` | Aggregate status entity |
+| `task_entity` | `sensor.jules_current_task` | Current task title entity |
+
+If the API returns nothing (no key yet / API unreachable), the card shows sample data so it still looks and behaves like Jules.
+
+## Entities and services
+
+| Entity | Meaning |
+|---|---|
+| `sensor.jules_agent_status` | `working` / `attention` / `paused` / `error` / `idle` |
+| `sensor.jules_current_task` | Title of the latest active session |
+| `sensor.jules_sessions` | State = number of sessions; attributes `sessions` and `sources` |
+| `sensor.jules_chat` | Chat of the last opened session; attribute `messages` |
+
+| Service | Fields | Effect |
+|---|---|---|
+| `jules.load_chat` | `session_id` | Loads session messages into `sensor.jules_chat` |
+| `jules.send_message` | `session_id`, `text` | Sends a message to the session, then refreshes the chat |
+| `jules.create_session` | `source_id`, `prompt` | Starts a new task for a codebase |
+
+> **API URL and key.** The integration expects the public Jules API: URL `https://jules.googleapis.com`, and a Jules API key as the token. If you created the integration entry before v1.2.0 with the old default URL (`api.jules.ai`), delete and re-add the integration so the new default is used.
 
 ## Troubleshooting
 
@@ -81,7 +99,7 @@ The card JS is served by the integration itself at `/jules_local/jules-agent-car
 
 **After updating the integration the card doesn't change**
 
-Browsers cache the card JS. Do a hard refresh (Ctrl+F5) after updating.
+Browsers cache the card JS. Do a hard refresh (Ctrl+F5) after updating. Note that HACS installs code from GitHub: if a fix exists only in your working copy (not committed, pushed and released), reinstalling via HACS brings the **old** version back. Publish a release and update through HACS, or copy the files manually.
 
 **Reinstalling**
 

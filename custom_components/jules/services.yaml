@@ -1,0 +1,47 @@
+load_chat:
+  name: Load chat
+  description: Load the chat messages of a Jules session into sensor.jules_chat.
+  fields:
+    session_id:
+      name: Session ID
+      description: "Full session name, e.g. sessions/1234567"
+      required: true
+      example: "sessions/1234567"
+      selector:
+        text:
+
+send_message:
+  name: Send message
+  description: Send a user message to a running Jules session.
+  fields:
+    session_id:
+      name: Session ID
+      description: "Full session name, e.g. sessions/1234567"
+      required: true
+      example: "sessions/1234567"
+      selector:
+        text:
+    text:
+      name: Message
+      description: Message text to send to Jules.
+      required: true
+      selector:
+        text:
+
+create_session:
+  name: Create session
+  description: Start a new Jules task for a codebase.
+  fields:
+    source_id:
+      name: Source ID
+      description: "Full source name, e.g. sources/1234567"
+      required: true
+      example: "sources/1234567"
+      selector:
+        text:
+    prompt:
+      name: Prompt
+      description: Task description for Jules.
+      required: true
+      selector:
+        text:

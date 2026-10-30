@@ -1,25 +1,159 @@
-"""API Client for Jules."""
+"""API client for the public Jules REST API (v1alpha)."""
+from __future__ import annotations
+
 import logging
+from typing import Any
+
 import aiohttp
 
 _LOGGER = logging.getLogger(__name__)
+
+DEFAULT_BASE = "https://jules.googleapis.com"
+
+
+class JulesApiError(Exception):
+    """Raised when the Jules API call fails."""
+
 
 class JulesApiClient:
     """Client for interacting with the Jules API."""
 
     def __init__(self, api_url: str, token: str, session: aiohttp.ClientSession):
-        """Initialize the API client."""
-        self._api_url = api_url.rstrip('/')
+        base = (api_url or "").strip() or DEFAULT_BASE
+        if base.endswith("/v1alpha"):
+            self._base = base
+        else:
+            self._base = base.rstrip("/") + "/v1alpha"
         self._token = token
         self._session = session
 
-    async def get_status(self) -> dict:
-        """Fetch the current status of the agent."""
-        # TODO: Implement real API call
-        # Для начала возвращаем моковые данные, структура которых будет соответствовать реальному API
+    def _headers(self) -> dict[str, str]:
         return {
-            "status": "working",
-            "current_task": "Analyzing codebase to implement requested features...",
-            "progress": 45,
-            "agent_name": "Jules"
+            "X-Goog-Api-Key": self._token,
+            "Content-Type": "application/json",
         }
+
+    async def _request(
+        self,
+        method: str,
+        path: str,
+        params: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
+    ) -> Any:
+        url = f"{self._base}{path}"
+        try:
+            async with self._session.request(
+                method,
+                url,
+                headers=self._headers(),
+                params=params,
+                json=json,
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as resp:
+                body = await resp.text()
+                if resp.status >= 400:
+                    _LOGGER.error(
+                        "Jules API %s %s failed: %s %s",
+                        method,
+                        url,
+                        resp.status,
+                        body[:300],
+                    )
+                    raise JulesApiError(f"{resp.status}: {body[:200]}")
+                return await resp.json(content_type=None)
+        except aiohttp.ClientError as err:
+            _LOGGER.error("Jules API connection error (%s %s): %s", method, url, err)
+            raise JulesApiError(str(err)) from err
+
+    async def list_sources(self) -> list[dict[str, Any]]:
+        """List connected codebases (GitHub repos)."""
+        data = await self._request("GET", "/sources")
+        sources = []
+        for item in data.get("sources", []) or []:
+            name = item.get("name", "")
+            gh = item.get("githubRepo", {}) or {}
+            repo = "/".join(p for p in (gh.get("owner", ""), gh.get("name", "")) if p)
+            sources.append(
+                {
+                    "id": name,
+                    "title": item.get("title") or repo or name,
+                    "repo": repo,
+                    "branch": gh.get("defaultBranch", "main"),
+                }
+            )
+        return sources
+
+    async def list_sessions(self) -> list[dict[str, Any]]:
+        """List recent sessions."""
+        data = await self._request("GET", "/sessions", params={"pageSize": 25})
+        sessions = []
+        for item in data.get("sessions", []) or []:
+            name = item.get("name", "")
+            source_id = None
+            ctx = item.get("sourceContext", {}) or {}
+            srcs = ctx.get("sources", []) or []
+            if srcs:
+                source_id = srcs[0].get("source")
+            sessions.append(
+                {
+                    "id": name,
+                    "title": item.get("title") or item.get("prompt") or name,
+                    "state": item.get("state", ""),
+                    "updateTime": item.get("updateTime", ""),
+                    "source_id": source_id,
+                }
+            )
+        return sessions
+
+    async def list_activities(self, session_id: str) -> list[dict[str, Any]]:
+        """List chat activities (messages, plans, MCP calls) of a session."""
+        path = f"/{session_id}/activities" if not session_id.startswith("/") else f"{session_id}/activities"
+        data = await self._request("GET", path, params={"pageSize": 100})
+        messages = []
+        for item in data.get("activities", []) or []:
+            originator = item.get("originator", "agent")
+            if "message" in item:
+                parts = (item.get("message", {}) or {}).get("parts", []) or []
+                text = "\n".join(p.get("text", "") for p in parts if p.get("text")).strip()
+                if text:
+                    messages.append(
+                        {"role": "user" if originator == "user" else "jules", "kind": "message", "text": text}
+                    )
+            elif "mcpCall" in item:
+                call = item.get("mcpCall", {}) or {}
+                messages.append(
+                    {
+                        "role": "jules",
+                        "kind": "mcp",
+                        "text": call.get("tool") or call.get("name") or "MCP Call",
+                    }
+                )
+            elif "planGenerated" in item:
+                steps = (item.get("planGenerated", {}) or {}).get("plan", {}).get("steps", []) or []
+                text = "\n".join(
+                    f"{i + 1}. {s.get('prompt', '')}" for i, s in enumerate(steps) if s.get("prompt")
+                )
+                if text:
+                    messages.append({"role": "jules", "kind": "plan", "text": text})
+            elif "state" in item:
+                state = (item.get("state", {}) or {}).get("state", "")
+                if state:
+                    messages.append({"role": "system", "kind": "state", "text": state.replace("_", " ").title()})
+        return messages
+
+    async def send_message(self, session_id: str, text: str) -> None:
+        """Send a user message to a session."""
+        path = f"/{session_id}:sendMessage"
+        await self._request(
+            "POST",
+            path,
+            json={"message": {"parts": [{"text": text}]}},
+        )
+
+    async def create_session(self, source_id: str, prompt: str) -> dict[str, Any]:
+        """Create a new session (task) for a codebase."""
+        payload: dict[str, Any] = {"prompt": prompt}
+        if source_id:
+            payload["sourceContext"] = {"sources": [{"source": source_id}]}
+        data = await self._request("POST", "/sessions", json=payload)
+        return {"id": data.get("name", ""), "title": data.get("title") or prompt, "state": data.get("state", "")}
