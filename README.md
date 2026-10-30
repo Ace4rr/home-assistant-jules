@@ -58,6 +58,35 @@ Now, you can add a manual card to your dashboard with the following YAML configu
 type: custom:jules-agent-card
 ```
 
+### Card options
+
+| Option | Default | Description |
+|---|---|---|
+| `title` | `Recent sessions` | Card header text |
+| `url` | `https://jules.google.com` | Link opened when clicking a session or "Open in Jules" |
+| `status_entity` | `sensor.jules_agent_status` | Entity used for the active-session status icon |
+| `task_entity` | `sensor.jules_current_task` | Entity used for the active-session title |
+| `sessions` | sample list | Extra rows under the active session: `[{title: "...", status: "done|active|attention"}]` |
+
+## Troubleshooting
+
+**"Custom element doesn't exist: jules-agent-card"**
+
+The card JS is served by the integration itself at `/jules_local/jules-agent-card.js`, so this error almost always means the browser failed to load that file:
+
+1. Make sure the integration is **set up** (Settings → Devices & Services → Jules Agent). The `/jules_local` path is registered only when the integration entry is loaded.
+2. Open `http://<your-ha>:8123/jules_local/jules-agent-card.js` in a browser tab — it must return JavaScript code, not 404. If it returns 404, the integration is not set up (see step 1).
+3. Check the resource: Settings → Dashboards → Resources → URL must be exactly `/jules_local/jules-agent-card.js`, type **JavaScript Module**.
+4. Hard-refresh the dashboard (**Ctrl+F5**, or force-kill and reopen the companion app) — browser caches resources aggressively.
+
+**After updating the integration the card doesn't change**
+
+Browsers cache the card JS. Do a hard refresh (Ctrl+F5) after updating.
+
+**Reinstalling**
+
+You can safely remove and re-add the integration at any time: HACS → delete, restart, install again, then set it up in Settings → Devices & Services (the API URL and token are stored in the integration entry, so you will need to enter them again). If HACS fails to download the repository, install the latest [release](https://github.com/Ace4rr/home-assistant-jules/releases) — updates are delivered through GitHub releases.
+
 ## Configuration
 
 Configuration is done via the Home Assistant UI. Go to Settings -> Devices & Services -> Add Integration and search for "Jules Agent".
