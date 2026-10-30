@@ -1,4 +1,4 @@
-# Home-Assistant Jules Agent Integration
+# Jules Agent
 
 [![GitHub Release](https://img.shields.io/github/v/release/Ace4rr/home-assistant-jules?style=for-the-badge)](https://github.com/Ace4rr/home-assistant-jules/releases)
 [![License](https://img.shields.io/github/license/Ace4rr/home-assistant-jules?style=for-the-badge)](LICENSE)
