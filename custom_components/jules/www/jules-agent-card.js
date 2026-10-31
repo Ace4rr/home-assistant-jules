@@ -1,3 +1,6 @@
+// The stats widget registers itself; failures (e.g. outside HA) are non-fatal.
+import("/jules_local/jules-stats-card.js").catch(() => {});
+
 const SAMPLE_SOURCES = [
   { id: "sample/src-al", title: "Ace4rr/AL_Challenge_Banking-PSBxMAI", repo: "Ace4rr/AL_Challenge_Banking-PSBxMAI", branch: "main" },
   { id: "sample/src-ha", title: "Ace4rr/home-assistant-jules", repo: "Ace4rr/home-assistant-jules", branch: "main" },
@@ -653,11 +656,11 @@ class JulesAgentCard extends HTMLElement {
     const count = (pred) => sessions.filter(pred).length;
     const total = sessions.length;
     const stats = [
-      { label: "In progress", n: count((s) => ["IN_PROGRESS", "QUEUED"].includes(s.state)), color: "#8ab4f8" },
-      { label: "Waiting for input", n: count((s) => ["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"].includes(s.state)), color: "#f5a623" },
-      { label: "Completed", n: count((s) => s.state === "COMPLETED"), color: "#34a853" },
-      { label: "Paused", n: count((s) => s.state === "PAUSED"), color: "#9aa0a6" },
-      { label: "Failed", n: count((s) => s.state === "FAILED"), color: "#f28b82" },
+      { label: "In progress", icon: "progress-clock", ic: "#9aa0a6", n: count((s) => ["IN_PROGRESS", "QUEUED"].includes(s.state)), color: "#8ab4f8" },
+      { label: "Waiting for input", icon: "alert-circle-outline", ic: "#f5a623", n: count((s) => ["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"].includes(s.state)), color: "#f5a623" },
+      { label: "Completed", icon: "check-circle-outline", ic: "#34a853", n: count((s) => s.state === "COMPLETED"), color: "#34a853" },
+      { label: "Paused", icon: "pause-circle-outline", ic: "#9aa0a6", n: count((s) => s.state === "PAUSED"), color: "#9aa0a6" },
+      { label: "Failed", icon: "close-circle-outline", ic: "#f28b82", n: count((s) => s.state === "FAILED"), color: "#f28b82" },
     ];
     const max = Math.max(1, ...stats.map((s) => s.n));
     const perRepo = {};
@@ -677,7 +680,7 @@ class JulesAgentCard extends HTMLElement {
         <div class="jules-scroll">
           ${stats.map((s) => `
             <div class="jules-stat">
-              <div class="l">${this._stateIcon(s.label === "In progress" ? "IN_PROGRESS" : s.label === "Waiting for input" ? "AWAITING_YOUR_INPUT" : s.label === "Completed" ? "COMPLETED" : s.label === "Paused" ? "PAUSED" : "FAILED", 14)}<span>${s.label}</span></div>
+              <div class="l"><ha-icon icon="mdi:${s.icon}" style="--mdc-icon-size:14px;color:${s.ic};"></ha-icon><span>${s.label}</span></div>
               <div class="barwrap"><div class="bar" style="width:${Math.round((s.n / max) * 100)}%;background:${s.color}"></div></div>
               <span class="n">${s.n}</span>
             </div>`).join("")}

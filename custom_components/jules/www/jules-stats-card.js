@@ -69,17 +69,17 @@ class JulesStatsCard extends HTMLElement {
       this.appendChild(this.card);
       this.style.display = "block";
     }
-    this.card.style.cssText = "background:#131314;border-radius:10px;overflow:hidden;color:#e3e3e3;";
+    this.card.style.cssText = "display:block;background:#131314;border-radius:10px;overflow:hidden;color:#e3e3e3;";
 
     const d = this._data();
     const sessions = d.sessions;
     const count = (states) => sessions.filter((s) => states.includes(s.state)).length;
     const stats = [
-      { label: "In progress", n: count(["IN_PROGRESS", "QUEUED"]), color: "#8ab4f8", icon: "progress-clock" },
-      { label: "Waiting for input", n: count(["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"]), color: "#f5a623", icon: "alert-circle-outline" },
-      { label: "Completed", n: count(["COMPLETED"]), color: "#34a853", icon: "check-circle-outline" },
-      { label: "Paused", n: count(["PAUSED"]), color: "#9aa0a6", icon: "pause-circle-outline" },
-      { label: "Failed", n: count(["FAILED"]), color: "#f28b82", icon: "close-circle-outline" },
+      { label: "In progress", icon: "progress-clock", ic: "#9aa0a6", n: count(["IN_PROGRESS", "QUEUED"]), color: "#8ab4f8" },
+      { label: "Waiting for input", icon: "alert-circle-outline", ic: "#f5a623", n: count(["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"]), color: "#f5a623" },
+      { label: "Completed", icon: "check-circle-outline", ic: "#34a853", n: count(["COMPLETED"]), color: "#34a853" },
+      { label: "Paused", icon: "pause-circle-outline", ic: "#9aa0a6", n: count(["PAUSED"]), color: "#9aa0a6" },
+      { label: "Failed", icon: "close-circle-outline", ic: "#f28b82", n: count(["FAILED"]), color: "#f28b82" },
     ];
     const max = Math.max(1, ...stats.map((s) => s.n));
     const repoById = {};
@@ -94,25 +94,25 @@ class JulesStatsCard extends HTMLElement {
 
     this.card.innerHTML = `
       <style>
-        .jsc { padding: 12px 14px; font-family: 'Google Sans', Roboto, system-ui, sans-serif; }
-        .jsc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .jsc-head img { width: 30px; height: 30px; }
-        .jsc-head .t { flex: 1; font-size: 15px; font-weight: 600; }
-        .jsc-head .t small { display: block; font-weight: 400; font-size: 11.5px; color: #9aa0a6; }
-        .jsc-head .cnt { background: #715cd7; border-radius: 8px; padding: 3px 10px; font-size: 13px; font-weight: 600; }
-        .jsc-row { display: flex; align-items: center; gap: 9px; padding: 4px 0; font-size: 12.5px; color: #c4c7c5; }
-        .jsc-row ha-icon { --mdc-icon-size: 15px; flex: none; }
+        .jsc { padding: 16px 16px 14px; font-family: 'Google Sans', Roboto, system-ui, sans-serif; }
+        .jsc-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .jsc-head img { width: 42px; height: 42px; }
+        .jsc-head .t { flex: 1; font-size: 16px; font-weight: 600; }
+        .jsc-head .t small { display: block; font-weight: 400; font-size: 12px; color: #9aa0a6; margin-top: 2px; }
+        .jsc-head .cnt { background: #715cd7; border-radius: 8px; padding: 5px 12px; font-size: 14px; font-weight: 600; }
+        .jsc-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 13px; color: #c4c7c5; }
+        .jsc-row ha-icon { --mdc-icon-size: 16px; flex: none; }
         .jsc-row .l { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .jsc-row .barwrap { flex: 1; height: 6px; border-radius: 3px; background: #26272a; overflow: hidden; }
+        .jsc-row .barwrap { flex: 1; height: 7px; border-radius: 3px; background: #26272a; overflow: hidden; }
         .jsc-row .bar { height: 100%; border-radius: 3px; }
-        .jsc-row .n { flex: none; width: 24px; text-align: right; color: #9aa0a6; }
-        .jsc-sec { color: #9aa0a6; font-size: 11.5px; padding: 10px 0 4px; }
-        .jsc-src { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 12.5px; cursor: pointer; }
+        .jsc-row .n { flex: none; width: 26px; text-align: right; color: #9aa0a6; font-size: 13px; }
+        .jsc-sec { color: #9aa0a6; font-size: 12px; padding: 14px 0 6px; }
+        .jsc-src { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; cursor: pointer; }
         .jsc-src:hover { color: #fff; }
         .jsc-src .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .jsc-src .n { color: #9aa0a6; }
-        .jsc-foot { display: flex; align-items: center; gap: 8px; color: #8e918f; font-size: 11.5px; padding-top: 10px; }
-        .jsc-empty { color: #8e918f; font-size: 12.5px; text-align: center; padding: 16px 0; }
+        .jsc-foot { display: flex; align-items: center; gap: 8px; color: #8e918f; font-size: 12px; padding-top: 14px; }
+        .jsc-empty { color: #8e918f; font-size: 13px; text-align: center; padding: 18px 0; }
       </style>
       <div class="jsc">
         <div class="jsc-head">
@@ -122,7 +122,7 @@ class JulesStatsCard extends HTMLElement {
         </div>
         ${sessions.length ? stats.map((s) => `
           <div class="jsc-row">
-            <ha-icon icon="mdi:${s.icon}" style="color:${s.color};"></ha-icon>
+            <ha-icon icon="mdi:${s.icon}" style="color:${s.ic};"></ha-icon>
             <span class="l">${s.label}</span>
             <div class="barwrap"><div class="bar" style="width:${Math.round((s.n / max) * 100)}%;background:${s.color}"></div></div>
             <span class="n">${s.n}</span>
