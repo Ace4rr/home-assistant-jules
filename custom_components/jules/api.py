@@ -122,33 +122,68 @@ class JulesApiClient:
         messages = []
         for item in data.get("activities", []) or []:
             originator = item.get("originator", "agent")
+
             if "message" in item:
                 parts = (item.get("message", {}) or {}).get("parts", []) or []
-                text = "\n".join(p.get("text", "") for p in parts if p.get("text")).strip()
+                text = "\n".join(
+                    p.get("text", "") for p in parts if isinstance(p, dict) and p.get("text")
+                ).strip()
                 if text:
                     messages.append(
                         {"role": "user" if originator == "user" else "jules", "kind": "message", "text": text}
                     )
+
+            elif "userInput" in item:
+                ui = item.get("userInput")
+                if isinstance(ui, str):
+                    text = ui.strip()
+                else:
+                    parts = (ui or {}).get("parts", []) or []
+                    text = "\n".join(
+                        p.get("text", "") for p in parts if isinstance(p, dict) and p.get("text")
+                    ).strip()
+                if text:
+                    messages.append({"role": "user", "kind": "message", "text": text})
+
+            elif "planGenerated" in item:
+                plan = (item.get("planGenerated", {}) or {}).get("plan", {}) or {}
+                steps = plan.get("steps", []) or []
+                titles = [
+                    (s.get("title") or s.get("prompt") or "").strip()
+                    for s in steps
+                    if isinstance(s, dict) and (s.get("title") or s.get("prompt"))
+                ]
+                if titles:
+                    text = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(titles))
+                    messages.append({"role": "jules", "kind": "plan", "text": text})
+
+            elif "artifacts" in item:
+                files = set()
+                for a in item.get("artifacts", []) or []:
+                    patch = (
+                        (((a or {}).get("changeSet") or {}).get("gitPatch") or {}).get("unidiffPatch")
+                        or ""
+                    )
+                    for line in patch.splitlines():
+                        if line.startswith("diff --git ") and " b/" in line:
+                            files.add(line.rsplit(" b/", 1)[-1].strip())
+                label = "Изменения кода: " + ", ".join(sorted(files)[:6])
+                messages.append({"role": "system", "kind": "changes", "text": label})
+
             elif "mcpCall" in item:
                 call = item.get("mcpCall", {}) or {}
-                messages.append(
-                    {
-                        "role": "jules",
-                        "kind": "mcp",
-                        "text": call.get("tool") or call.get("name") or "MCP Call",
-                    }
-                )
-            elif "planGenerated" in item:
-                steps = (item.get("planGenerated", {}) or {}).get("plan", {}).get("steps", []) or []
-                text = "\n".join(
-                    f"{i + 1}. {s.get('prompt', '')}" for i, s in enumerate(steps) if s.get("prompt")
-                )
-                if text:
-                    messages.append({"role": "jules", "kind": "plan", "text": text})
+                label = call.get("tool") or call.get("name") or "MCP Call"
+                messages.append({"role": "jules", "kind": "mcp", "text": label})
+
             elif "state" in item:
                 state = (item.get("state", {}) or {}).get("state", "")
                 if state:
-                    messages.append({"role": "system", "kind": "state", "text": state.replace("_", " ").title()})
+                    messages.append(
+                        {"role": "system", "kind": "state", "text": str(state).replace("_", " ").title()}
+                    )
+
+            # progressUpdated and other no-content activities are skipped
+
         if not messages and isinstance(data, dict) and data.get("activities"):
             first = data["activities"][0]
             _LOGGER.warning(

@@ -601,6 +601,12 @@ class JulesAgentCard extends HTMLElement {
           <div class="mcpcall">${this._icon("account-convert-outline", 16)} <span class="k">MCP Call</span> <b>${julesEscape(m.text.replace(/^MCP Call\s*/, ""))}</b></div>
         </div>`;
     }
+    if (m.kind === "changes") {
+      return `
+        <div class="jules-msg">
+          <div class="mcpcall">${this._icon("source-commit", 16)} ${julesEscape(m.text)}</div>
+        </div>`;
+    }
     if (m.role === "user") {
       return `<div class="jules-msg user"><div class="bubble">${julesEscape(m.text)}</div></div>`;
     }
