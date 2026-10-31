@@ -20,14 +20,29 @@ const SAMPLE_SCHEDULED = [
   { title: "Напиши readme по типу как в https://github.com/meshtastic/home-assistant", when: "Once on 2026-10-26 at 11:30 AM" },
 ];
 
-const SAMPLE_MESSAGES = [
-  { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск npm run start успешно проходят локально." },
-  { role: "user", kind: "message", text: "Могу ли я считать эту задачу успешно завершенной?" },
-  { role: "jules", kind: "message", text: "Да, задача выполнена. Все изменения закоммичены в текущей ветке (jules-6624644291350414200-a471c40f)." },
-  { role: "user", kind: "message", text: "Сделай pull request, я смерджу и тогда да" },
-  { role: "jules", kind: "message", text: "Я отправил изменения в репозиторий. Пожалуйста, создайте Pull Request из ветки jules-6624644291350414200-a471c40f в main. Как только вы его смерджите, дайте мне знать, и я завершу задачу." },
-  { role: "jules", kind: "mcp", text: "MCP Call  connect  Render" },
-  { role: "jules", kind: "message", text: "Я отправил пуш и запрос на создание пулл-реквеста через специальный внутренний API. Проверьте, пожалуйста, появился ли pull-реквест в вашем репозитории." },
+const SAMPLE_CHATS = [
+  [
+    { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск npm run start успешно проходят локально." },
+    { role: "user", kind: "message", text: "Могу ли я считать эту задачу успешно завершенной?" },
+    { role: "jules", kind: "message", text: "Да, задача выполнена. Все изменения закоммичены в текущей ветке (jules-6624644291350414200-a471c40f)." },
+    { role: "user", kind: "message", text: "Сделай pull request, я смерджу и тогда да" },
+    { role: "jules", kind: "message", text: "Я отправил изменения в репозиторий. Пожалуйста, создайте Pull Request из ветки jules-6624644291350414200-a471c40f в main. Как только вы его смерджите, дайте мне знать, и я завершу задачу." },
+    { role: "jules", kind: "mcp", text: "MCP Call  connect  Render" },
+    { role: "jules", kind: "message", text: "Я отправил пуш и запрос на создание пулл-реквеста через специальный внутренний API. Проверьте, пожалуйста, появился ли pull-реквест в вашем репозитории." },
+  ],
+  [
+    { role: "user", kind: "message", text: "Проверь, почему сенсор показывает unavailable после рестарта HA." },
+    { role: "jules", kind: "message", text: "Разобрался: сущность создавалась до первого успешного ответа API. Я добавил состояние «unknown» до получения данных и повторную попытку настройки через 30 секунд.\n\nИзменения закоммичены в ветке jules-fix-sensor-state." },
+    { role: "user", kind: "message", text: "Отлично, добавь тест на этот кейс" },
+    { role: "jules", kind: "message", text: "Добавил тест test_sensor_unavailable_before_first_refresh. Все 7 тестов проходят. Нужен ли pull request?" },
+  ],
+  [
+    { role: "user", kind: "message", text: "Собери README в стиле Meshtastic: бейджи, скриншоты, таблица параметров." },
+    { role: "jules", kind: "message", text: "Готово. Обновил README: добавил бейджи HACS/релиза, таблицу сущностей и сервисов, раздел устранения неполадок.\n\nПросьба посмотреть и подтвердить." },
+    { role: "jules", kind: "mcp", text: "MCP Call  push_files  github" },
+    { role: "user", kind: "message", text: "Выглядит хорошо, мержу" },
+    { role: "jules", kind: "message", text: "Принял, задачу закрываю." },
+  ],
 ];
 
 const GH_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>';
@@ -80,6 +95,7 @@ class JulesAgentCard extends HTMLElement {
       chat_entity: "sensor.jules_chat",
       status_entity: "sensor.jules_agent_status",
       task_entity: "sensor.jules_current_task",
+      height: "660px",
       ...config,
     };
     this._renderKey = "";
@@ -263,7 +279,7 @@ class JulesAgentCard extends HTMLElement {
         gap: 10px; padding: 10px;
         background: #131314; color: #e3e3e3;
         font-family: 'Google Sans', Roboto, system-ui, -apple-system, sans-serif;
-        height: 660px;
+        height: ${julesEscape(this.config.height || "660px")};
       }
       .jules-app.narrow { grid-template-columns: 46px 1fr; grid-auto-rows: minmax(300px, auto); height: auto; }
       .jules-app.narrow .jules-chat, .jules-app.narrow .jules-right { grid-column: 1 / -1; }
@@ -533,7 +549,10 @@ class JulesAgentCard extends HTMLElement {
     }
     const real = !this._isSample(this._chatSession.id);
     const loaded = d.chat.id === this._chatSession.id;
-    const messages = real ? (loaded ? d.chat.messages : []) : SAMPLE_MESSAGES;
+    const idx = Math.max(0, d.sessions.findIndex((s) => s.id === this._chatSession.id));
+    const messages = real
+      ? (loaded ? d.chat.messages : [])
+      : SAMPLE_CHATS[idx % SAMPLE_CHATS.length];
     const session = d.sessions.find((s) => s.id === this._chatSession.id) || {};
     const state = session.state || (real ? "" : "AWAITING_YOUR_INPUT");
     const all = [...messages, ...this._pending];
@@ -544,6 +563,7 @@ class JulesAgentCard extends HTMLElement {
         <div class="jules-panel-head">
           <span class="gh">${GH_SVG}</span>
           <span class="t" title="${julesEscape(this._chatSession.title)}">${julesEscape(repo ? repo.repo + " — " : "")}${julesEscape(this._chatSession.title)}</span>
+          ${real ? "" : '<span class="jules-badge">demo</span>'}
           <span class="jules-iconbtn" data-action="open-jules" title="Открыть в Jules">${this._icon("open-in-new", 15)}</span>
           <span class="x" data-action="close-chat" title="Закрыть чат">${this._icon("close", 16)}</span>
         </div>

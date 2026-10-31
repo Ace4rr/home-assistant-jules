@@ -66,8 +66,22 @@ type: custom:jules-agent-card
 | `chat_entity` | `sensor.jules_chat` | Entity with the opened chat messages |
 | `status_entity` | `sensor.jules_agent_status` | Aggregate status entity |
 | `task_entity` | `sensor.jules_current_task` | Current task title entity |
+| `height` | `660px` | Card height, e.g. `calc(100vh - 120px)` for fullscreen views |
 
 If the API returns nothing (no key yet / API unreachable), the card shows sample data so it still looks and behaves like Jules.
+
+### Fullscreen view
+
+Cards inside **Sections** dashboards are locked to the section width. To get the full multi-panel layout, create a view of type **Panel** (Edit dashboard → Add view → View type **Panel**) and add the `custom:jules-agent-card` there — it will span the whole screen. In YAML:
+
+```yaml
+- type: panel
+  title: Jules
+  cards:
+    - type: custom:jules-agent-card
+```
+
+Tip: in a panel view set `height: calc(100vh - 120px)` in the card options so the card fills the screen height.
 
 ## Entities and services
 
@@ -109,3 +123,37 @@ You can safely remove and re-add the integration at any time: HACS → delete, r
 
 Configuration is done via the Home Assistant UI. Go to Settings -> Devices & Services -> Add Integration and search for "Jules Agent".
 You will need to provide the API URL and your access token.
+
+## For maintainers: publishing a release
+
+HACS delivers updates through GitHub releases. A release must look like this:
+
+1. Bump `"version"` in `custom_components/jules/manifest.json` (e.g. `1.3.0`) — it must differ from the previous release.
+2. Commit and push everything to `main`.
+3. On GitHub open **Releases → Draft a new release**:
+   * **Choose a tag**: `v1.3.0` (the manifest version with a `v` prefix), create the tag on `main`;
+   * **Target**: `main`;
+   * **Title**: e.g. `v1.3.0 — Multi-panel Jules interface`;
+   * **Notes**: press "Generate release notes" to list the commits, edit as needed;
+   * **Publish release**. No binary assets are required — HACS downloads the source archive itself.
+4. In a few minutes HACS will show the update: HACS → Jules Agent → **Update** → restart Home Assistant → Ctrl+F5 in the dashboard.
+
+The tag version must be new and strictly match the manifest version, otherwise HACS will not offer the update. If the repository has no releases at all, HACS falls back to tracking `main`, but "Update" may fail — always publish a release.
+
+## Branding / integration icon
+
+Since Home Assistant 2026.3, custom integrations can ship their own brand images — this repository already includes them:
+
+```
+custom_components/jules/brand/
+├── icon.png      # 256×256
+├── icon@2x.png   # 512×512
+├── logo.png      # 128×128
+└── logo@2x.png   # 256×256
+```
+
+Home Assistant serves these through its local brands proxy (`/api/brands/integration/jules/...`), so the Jules icon shows up in Settings → Devices & Services and in the frontend without any extra setup.
+
+If the icon still shows as a generic "custom integration" placeholder in the HACS store list, add the same images to the official [`home-assistant/brands`](https://github.com/home-assistant/brands) repository: fork it, put the four files into `custom_integrations/jules/`, and open a PR. After the merge the icon is served from `brands.home-assistant.io` for everyone.
+
+Tip: also set the purple octopus as the GitHub **social preview** (Repository → Settings → General → Social preview) — HACS uses it as the repository banner.
