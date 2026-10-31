@@ -253,7 +253,7 @@ class JulesAgentCard extends HTMLElement {
     `;
 
     this._appendMenu(d);
-    this._attachEvents(d);
+    this._bindOnce();
     this._updateWidthClass();
     this._restoreFocus();
     const box = this.card.querySelector(".jp-chat-scroll");
@@ -528,7 +528,7 @@ class JulesAgentCard extends HTMLElement {
             ${this._icon(this._schedOpen ? "chevron-up" : "chevron-down", 16)}
           </div>
           ${this._schedOpen ? SAMPLE_SCHEDULED.map((s) => `
-            <div class="jules-row">
+            <div class="jules-row" data-scheduled title="Открыть в Jules">
               ${this._icon("clock-outline", 15)}
               <div class="t">
                 <div class="ttl" title="${julesEscape(s.title)}">${julesEscape(s.title)}</div>
@@ -707,82 +707,92 @@ class JulesAgentCard extends HTMLElement {
     while (wrap.firstChild) this.card.appendChild(wrap.firstChild);
   }
 
-  _attachEvents(d) {
-    const q = (sel) => this.card.querySelector(sel);
-    const qa = (sel) => [...this.card.querySelectorAll(sel)];
-
-    qa("[data-session]").forEach((el) => {
-      el.addEventListener("click", (ev) => {
-        if (ev.target.closest("[data-menu]")) return;
-        const session = d.sessions.find((s) => s.id === el.dataset.session);
-        if (session) this._openChat(session);
-      });
-    });
-
-    const search = q('[data-focus="search"]');
-    if (search) {
-      search.addEventListener("input", () => {
-        this._search = search.value;
+  _bindOnce() {
+    if (this._bound) return;
+    this._bound = true;
+    this.card.addEventListener("click", (ev) => this._handleClick(ev));
+    this.card.addEventListener("input", (ev) => {
+      if (!ev.target.matches) return;
+      if (ev.target.matches('[data-focus="search"]')) {
+        this._search = ev.target.value;
         this._focus = "search";
         this._render();
-      });
-    }
-
-    const promptBox = q("[data-prompt-input]");
-    if (promptBox) {
-      promptBox.addEventListener("input", () => { this._promptDraft = promptBox.value; });
-    }
-
-    const chatInput = q("[data-chat-input]");
-    if (chatInput) {
-      chatInput.addEventListener("input", () => { this._chatDraft = chatInput.value; });
-      chatInput.addEventListener("keydown", (ev) => { if (ev.key === "Enter") this._sendChatMessage(); });
-    }
-
-    qa("[data-menu]").forEach((el) => {
-      el.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        this._menuFor = this._menuFor === el.dataset.menu ? null : el.dataset.menu;
-        this._render();
-      });
+      } else if (ev.target.matches("[data-chat-input]")) {
+        this._chatDraft = ev.target.value;
+      } else if (ev.target.matches("[data-prompt-input]")) {
+        this._promptDraft = ev.target.value;
+      }
     });
+    this.card.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Enter" || !ev.target.matches) return;
+      if (ev.target.matches("[data-chat-input]")) {
+        ev.preventDefault();
+        this._sendChatMessage();
+      }
+    });
+  }
 
-    qa("[data-maction]").forEach((el) => {
-      el.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        const action = el.dataset.maction;
+  _handleClick(ev) {
+    const d = this._data();
+    const t = ev.target;
+
+    const maction = t.closest("[data-maction]");
+    if (maction) {
+      ev.stopPropagation();
+      const action = maction.dataset.maction;
+      this._menuFor = null;
+      if (action === "refresh") this._refresh();
+      else if (action === "chat" && this._menuSession) this._openChat(this._menuSession);
+      else if (action === "openjules" && this._menuSession) this._openJules(this._menuSession);
+      this._render();
+      return;
+    }
+
+    const menuEl = t.closest("[data-menu]");
+    if (menuEl) {
+      ev.stopPropagation();
+      this._menuFor = this._menuFor === menuEl.dataset.menu ? null : menuEl.dataset.menu;
+      this._render();
+      return;
+    }
+
+    const actEl = t.closest("[data-action]");
+    if (actEl) {
+      const action = actEl.dataset.action;
+      if (action === "viewmore") {
+        this._sessionsExpanded = !this._sessionsExpanded;
+        this._render();
+      } else if (action === "toggle-sched") {
+        this._schedOpen = !this._schedOpen;
+        this._render();
+      } else if (action === "close-chat") {
+        this._closeChat();
+      } else if (action === "send-chat") {
+        this._sendChatMessage();
+      } else if (action === "create") {
+        this._createSession();
+      } else if (action === "refresh") {
+        this._refresh();
+      } else if (action === "open-jules" && this._chatSession) {
+        this._openJules(this._chatSession);
+      } else if (action === "close-menu") {
         this._menuFor = null;
-        if (action === "refresh") this._refresh();
-        else if (action === "chat" && this._menuSession) this._openChat(this._menuSession);
-        else if (action === "openjules" && this._menuSession) this._openJules(this._menuSession);
         this._render();
-      });
-    });
+      }
+      return;
+    }
 
-    const backdrop = q("[data-action='close-menu']");
-    if (backdrop) backdrop.addEventListener("click", () => { this._menuFor = null; this._render(); });
+    const sessEl = t.closest("[data-session]");
+    if (sessEl) {
+      const session = d.sessions.find((s) => s.id === sessEl.dataset.session);
+      if (session) this._openChat(session);
+      return;
+    }
 
-    qa("[data-action]").forEach((el) => {
-      const action = el.dataset.action;
-      if (action === "close-menu") return;
-      el.addEventListener("click", () => {
-        if (action === "viewmore") {
-          this._sessionsExpanded = !this._sessionsExpanded; this._render();
-        } else if (action === "toggle-sched") {
-          this._schedOpen = !this._schedOpen; this._render();
-        } else if (action === "close-chat") {
-          this._closeChat();
-        } else if (action === "send-chat") {
-          this._sendChatMessage();
-        } else if (action === "create") {
-          this._createSession();
-        } else if (action === "refresh") {
-          this._refresh();
-        } else if (action === "open-jules" && this._chatSession) {
-          this._openJules(this._chatSession);
-        }
-      });
-    });
+    const schedEl = t.closest("[data-scheduled]");
+    if (schedEl) {
+      window.open(this.config.url, "_blank");
+    }
   }
 
   getCardSize() {

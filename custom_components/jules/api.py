@@ -120,6 +120,7 @@ class JulesApiClient:
                 str(data),
             )
         messages = []
+        seen_changes = set()
         for item in data.get("activities", []) or []:
             originator = item.get("originator", "agent")
 
@@ -168,6 +169,9 @@ class JulesApiClient:
                         if line.startswith("diff --git ") and " b/" in line:
                             files.add(line.rsplit(" b/", 1)[-1].strip())
                 label = "Изменения кода: " + ", ".join(sorted(files)[:6])
+                if label in seen_changes:
+                    continue
+                seen_changes.add(label)
                 messages.append({"role": "system", "kind": "changes", "text": label})
 
             elif "mcpCall" in item:
