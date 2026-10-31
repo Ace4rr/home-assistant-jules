@@ -171,4 +171,6 @@ class JulesChatSensor(SensorEntity):
             "title": chat.get("title", ""),
             ATTR_MESSAGES: chat.get("messages", []),
             "error": chat.get("error"),
+            "branch": chat.get("branch"),
+            "pr_url": chat.get("pr_url"),
         }

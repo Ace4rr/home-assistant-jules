@@ -175,6 +175,7 @@ class JulesApiClient:
 
             elif "artifacts" in item:
                 files = set()
+                adds = dels = 0
                 for a in item.get("artifacts", []) or []:
                     patch = (
                         (((a or {}).get("changeSet") or {}).get("gitPatch") or {}).get("unidiffPatch")
@@ -185,7 +186,24 @@ class JulesApiClient:
                             f = line.rsplit(" b/", 1)[-1].strip()
                             if f and "__pycache__" not in f and not f.endswith(".pyc"):
                                 files.add(f)
-                messages.append({"role": "system", "kind": "changes", "files": sorted(files)})
+                        elif line.startswith("+") and not line.startswith("+++"):
+                            adds += 1
+                        elif line.startswith("-") and not line.startswith("---"):
+                            dels += 1
+                messages.append({
+                    "role": "system", "kind": "changes", "files": sorted(files),
+                    "adds": adds, "dels": dels, "time": item.get("createTime", ""),
+                })
+
+            elif "progressUpdated" in item:
+                pu = item.get("progressUpdated")
+                text = ""
+                if isinstance(pu, dict):
+                    text = str(pu.get("progress") or pu.get("description") or pu.get("title") or pu.get("text") or "").strip()
+                elif isinstance(pu, str):
+                    text = pu.strip()
+                if text:
+                    messages.append({"role": "jules", "kind": "progress", "text": text})
 
             elif "mcpCall" in item:
                 call = item.get("mcpCall", {}) or {}
@@ -227,6 +245,20 @@ class JulesApiClient:
                 str(first),
             )
         return result
+
+    async def get_session(self, session_id: str) -> dict[str, Any]:
+        """Fetch session details (branch, PR link) if the API exposes them."""
+        data = await self._request("GET", f"/{session_id}")
+        branch = pr_url = None
+        if isinstance(data, dict):
+            git = data.get("gitInfo") or {}
+            if isinstance(git, dict):
+                branch = git.get("currentBranch")
+            branch = branch or data.get("currentBranch") or data.get("branch")
+            pr_obj = data.get("pullRequest") or {}
+            if isinstance(pr_obj, dict):
+                pr_url = pr_obj.get("url")
+        return {"branch": branch, "pr_url": pr_url}
 
     async def send_message(self, session_id: str, text: str) -> None:
         """Send a user message to a session."""

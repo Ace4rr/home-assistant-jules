@@ -99,8 +99,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             error = None
             if not messages:
                 error = "API вернул пустую историю (HTTP 200) — детали в логах HA, фильтр 'jules'"
+        branch = pr_url = None
+        try:
+            detail = await client.get_session(session_id)
+            branch, pr_url = detail.get("branch"), detail.get("pr_url")
+        except Exception:  # noqa: BLE001 — detail is optional decoration
+            pass
         store = hass.data[DOMAIN][entry.entry_id]["chat"]
-        store.update({"session_id": session_id, "title": session_id, "messages": messages, "error": error})
+        store.update({
+            "session_id": session_id, "title": session_id, "messages": messages,
+            "error": error, "branch": branch, "pr_url": pr_url,
+        })
         entity = hass.data[DOMAIN][entry.entry_id]["entities"].get("chat")
         if entity:
             entity.async_write_ha_state()

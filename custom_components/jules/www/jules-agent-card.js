@@ -79,9 +79,6 @@ class JulesAgentCard extends HTMLElement {
     this._schedOpen = true;
     this._menuFor = null;
     this._menuSession = null;
-    this._pending = [];
-    this._promptDraft = "";
-    this._chatDraft = "";
     this._renderKey = "";
     this._focus = null;
     this._ro = null;
@@ -107,7 +104,6 @@ class JulesAgentCard extends HTMLElement {
     if (!this.config) return;
     const key = this._dataKey();
     if (key !== this._renderKey) {
-      this._pending = [];
       this._renderKey = key;
       this._render();
     }
@@ -144,6 +140,8 @@ class JulesAgentCard extends HTMLElement {
       title: cAttrs.title || "",
       messages: Array.isArray(cAttrs.messages) ? cAttrs.messages : [],
       error: cAttrs.error || "",
+      branch: cAttrs.branch || "",
+      pr: cAttrs.pr_url || "",
     };
     return { sessions, sources, chat };
   }
@@ -157,7 +155,6 @@ class JulesAgentCard extends HTMLElement {
       c ? c.state : null, d.chat.messages.length,
       this._chatSession, this._menuFor, this._search,
       this._sessionsExpanded, this._schedOpen,
-      this._promptDraft, this._chatDraft, this._pending.length,
     ]);
   }
 
@@ -195,34 +192,6 @@ class JulesAgentCard extends HTMLElement {
     }
   }
 
-  _createSession() {
-    const box = this.card.querySelector("[data-prompt-input]");
-    const sel = this.card.querySelector("[data-source-select]");
-    const text = (box ? box.value : this._promptDraft).trim();
-    const sourceId = sel ? sel.value : null;
-    if (!text) return;
-    this._promptDraft = "";
-    if (sourceId && !this._isSample(sourceId) && this._hass.callService) {
-      this._hass.callService("jules", "create_session", { source_id: sourceId, prompt: text });
-    }
-    this._render();
-  }
-
-  _sendChatMessage() {
-    const input = this.card.querySelector("[data-chat-input]");
-    const text = (input ? input.value : this._chatDraft).trim();
-    if (!text || !this._chatSession) return;
-    this._chatDraft = "";
-    const id = this._chatSession.id;
-    if (id && !this._isSample(id) && this._hass.callService) {
-      this._hass.callService("jules", "send_message", { session_id: id, text });
-      this._pending.push({ role: "user", kind: "message", text });
-    }
-    this._render();
-    const box = this.card.querySelector(".jp-chat-scroll");
-    if (box) box.scrollTop = box.scrollHeight;
-  }
-
   _render() {
     if (!this.config) return;
 
@@ -247,7 +216,6 @@ class JulesAgentCard extends HTMLElement {
       ${this._sessionsPanelHtml(d)}
       ${this._chatPanelHtml(d)}
       <div class="jules-right">
-        ${this._newTaskPanelHtml(d)}
         ${this._statsPanelHtml(d)}
       </div>
     `;
@@ -265,9 +233,7 @@ class JulesAgentCard extends HTMLElement {
     const el = this.card.querySelector(`[data-focus="${this._focus}"]`);
     if (el) {
       el.focus();
-      const v = this._focus === "search" ? this._search
-        : this._focus === "prompt" ? this._promptDraft : this._chatDraft;
-      try { el.setSelectionRange(v.length, v.length); } catch (e) { /* not a text field */ }
+      try { el.setSelectionRange(this._search.length, this._search.length); } catch (e) { /* not a text field */ }
     }
     this._focus = null;
   }
@@ -440,6 +406,39 @@ class JulesAgentCard extends HTMLElement {
         animation: jules-spin 1s linear infinite;
       }
       @keyframes jules-spin { to { transform: rotate(360deg); } }
+      /* --- jules-style chat items --- */
+      .jules-plan { background: #1e1f20; border-radius: 7px; padding: 2px 0; width: 100%; }
+      .plan-step { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; font-size: 13px; }
+      .plan-step + .plan-step { border-top: 1px solid #26272a; }
+      .plan-num { flex: none; width: 18px; height: 18px; border-radius: 50%; background: #8ab4f8; color: #131314;
+        font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+      .jules-updated { font-size: 13px; color: #e3e3e3; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .file-chip { background: #26272a; border-radius: 4px; padding: 2px 7px; font-family: monospace;
+        font-size: 11.5px; color: #c4c7c5; }
+      .jules-state-pill { align-self: center; background: #26272a; border-radius: 999px; padding: 6px 14px;
+        font-size: 12.5px; color: #c4c7c5; }
+      .jules-progress-line { font-size: 13px; color: #e3e3e3; }
+      .jules-mcp { display: flex; align-items: center; gap: 10px; background: #1e1f20; border-radius: 7px;
+        padding: 11px 14px; font-size: 13px; width: 100%; cursor: pointer; }
+      .jules-mcp .k { color: #9aa0a6; }
+      .jules-mcp .chev { margin-left: auto; transition: transform .2s; color: #9aa0a6; }
+      .jules-mcp.open .chev { transform: rotate(180deg); }
+      .jules-review { width: 100%; background: #1e1f20; border: 1px solid #715cd7; border-radius: 7px;
+        padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+      .jules-review .rv-title { font-size: 13.5px; font-weight: 500; }
+      .jules-review .rv-stats { display: flex; gap: 10px; font-family: monospace; font-size: 12px; }
+      .jules-review .adds { color: #34a853; }
+      .jules-review .dels { color: #f28b82; }
+      .jules-review .rv-files { display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+        font-size: 12.5px; color: #9aa0a6; }
+      .jules-review .rv-branch { align-self: flex-start; font-family: monospace; font-size: 11.5px;
+        color: #9aa0a6; background: #26272a; border-radius: 4px; padding: 3px 8px; }
+      .jules-review .rv-actions { display: flex; align-items: center; gap: 12px; }
+      .jules-review .rv-btn { background: #e3e3e3; color: #1b1c1e; border-radius: 6px; padding: 6px 12px;
+        font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: none; }
+      .jules-review .rv-btn:hover { background: #fff; }
+      .jules-review .rv-thumbs { margin-left: auto; display: flex; align-items: center; gap: 8px;
+        color: #9aa0a6; font-size: 12px; cursor: pointer; }
     `;
   }
 
@@ -453,6 +452,7 @@ class JulesAgentCard extends HTMLElement {
       case "QUEUED":
         return '<div class="jules-spinner"></div>';
       case "AWAITING_YOUR_INPUT":
+      case "AWAITING_USER_FEEDBACK":
         return this._icon("alert-circle-outline", size || 15);
       case "PAUSED":
         return this._icon("pause-circle-outline", size || 15);
@@ -468,6 +468,7 @@ class JulesAgentCard extends HTMLElement {
       IN_PROGRESS: "In progress",
       QUEUED: "Queued",
       AWAITING_YOUR_INPUT: "Waiting for your input",
+      AWAITING_USER_FEEDBACK: "Waiting for your input",
       PAUSED: "Paused",
       FAILED: "Failed",
       COMPLETED: "Completed",
@@ -557,8 +558,9 @@ class JulesAgentCard extends HTMLElement {
       : SAMPLE_CHATS[idx % SAMPLE_CHATS.length];
     const session = d.sessions.find((s) => s.id === this._chatSession.id) || {};
     const state = session.state || (real ? "" : "AWAITING_YOUR_INPUT");
-    const all = [...messages, ...this._pending];
+    const all = [...messages];
     const repo = d.sources.find((s) => s.id === session.source_id);
+    const waiting = ["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"].includes(state);
 
     return `
       <div class="jules-panel jules-chat">
@@ -575,37 +577,66 @@ class JulesAgentCard extends HTMLElement {
               ${this._icon("alert-circle-outline", 15)}
               <span class="t">Не удалось загрузить чат: ${julesEscape(d.chat.error)}</span>
             </div>` : ""}
-          ${state === "AWAITING_YOUR_INPUT" ? `
+          ${waiting ? `
             <div class="jules-banner">
               ${this._icon("alert-circle-outline", 15)}
               <span class="t">Jules is waiting for your input to continue working</span>
             </div>` : ""}
           <div class="jules-msgs">
-            ${all.length ? all.map((m) => this._messageHtml(m)).join("") : `
+            ${all.length ? all.map((m, i) => this._messageHtml(
+                m,
+                m.kind === "changes" && !all.slice(i + 1).some((x) => x.kind === "changes"),
+                d,
+              )).join("") : `
               <div class="jules-empty">${real && !loaded ? "Loading chat..." : "No messages yet"}</div>`}
           </div>
-        </div>
-        <div class="jules-chat-input">
-          <input data-focus="chat" data-chat-input placeholder="Talk to Jules" value="${julesEscape(this._chatDraft)}">
-          <div class="jules-sendbtn" data-action="send-chat" title="Send">${this._icon("arrow-up", 16)}</div>
         </div>
         <div class="jules-chat-foot">Jules can make mistakes so double-check it and <a href="${julesEscape(this.config.url)}" target="_blank" rel="noopener">use code with caution</a></div>
       </div>
     `;
   }
 
-  _messageHtml(m) {
-    if (m.kind === "mcp") {
+  _messageHtml(m, isLast, d) {
+    if (m.kind === "plan") {
+      const steps = String(m.text).split("\n").map((s) => s.replace(/^\s*\d+\.\s*/, ""));
       return `
-        <div class="jules-msg">
-          <div class="mcpcall">${this._icon("account-convert-outline", 16)} <span class="k">MCP Call</span> <b>${julesEscape(m.text.replace(/^MCP Call\s*/, ""))}</b></div>
-        </div>`;
+        <div class="jules-msg"><div class="jules-plan">
+          ${steps.map((s, i) => `<div class="plan-step"><span class="plan-num">${i + 1}</span><span>${julesEscape(s)}</span></div>`).join("")}
+        </div></div>`;
     }
     if (m.kind === "changes") {
+      const files = Array.isArray(m.files) && m.files.length ? m.files
+        : String(m.text || "").replace("Изменения кода: ", "").split(", ").filter(Boolean);
+      const chips = files.map((f) => `<span class="file-chip">${julesEscape(f)}</span>`).join(" ");
+      if (isLast) {
+        const shortId = String(this._chatSession.id || "").replace(/^.*\//, "");
+        const pr = d.chat.pr || `${this.config.url}/session/${shortId}`;
+        return `
+        <div class="jules-msg"><div class="jules-review">
+          <div class="rv-title">Ready for review 🎉</div>
+          ${m.adds || m.dels ? `<div class="rv-stats"><span class="adds">+${m.adds || 0}</span><span class="dels">−${m.dels || 0}</span></div>` : ""}
+          <div class="rv-files">Updated ${chips}</div>
+          ${d.chat.branch ? `<div class="rv-branch">⑂ ${julesEscape(d.chat.branch)}</div>` : ""}
+          <div class="rv-actions">
+            <a class="rv-btn" href="${julesEscape(pr)}" target="_blank" rel="noopener">View PR</a>
+            <span class="rv-thumbs" data-action="open-jules" title="Оценить в Jules">How'd Jules do? ${this._icon("thumb-up-outline", 15)} ${this._icon("thumb-down-outline", 15)}</span>
+          </div>
+        </div></div>`;
+      }
+      return `<div class="jules-msg"><div class="jules-updated">Updated ${chips}</div></div>`;
+    }
+    if (m.kind === "state") {
+      return `<div class="jules-msg"><div class="jules-state-pill">${julesEscape(m.text)}</div></div>`;
+    }
+    if (m.kind === "progress") {
+      return `<div class="jules-msg"><div class="jules-progress-line">${julesEscape(m.text)}</div></div>`;
+    }
+    if (m.kind === "mcp") {
       return `
-        <div class="jules-msg">
-          <div class="mcpcall">${this._icon("source-commit", 16)} ${julesEscape(m.text)}</div>
-        </div>`;
+        <div class="jules-msg"><div class="jules-mcp" title="Подробнее в Jules">
+          ${this._icon("account-convert-outline", 16)} <span class="k">MCP Call</span> <b>${julesEscape(String(m.text).replace(/^MCP Call\s*/, ""))}</b>
+          <ha-icon class="chev" icon="mdi:chevron-down" style="--mdc-icon-size:16px;"></ha-icon>
+        </div></div>`;
     }
     if (m.role === "user") {
       return `<div class="jules-msg user"><div class="bubble">${julesEscape(m.text)}</div></div>`;
@@ -617,31 +648,13 @@ class JulesAgentCard extends HTMLElement {
       </div>`;
   }
 
-  _newTaskPanelHtml(d) {
-    return `
-      <div class="jules-panel">
-        <div class="jules-panel-head">
-          ${this._icon("plus", 16)}<span class="t">New session</span>
-        </div>
-        <div class="jules-taskbox">
-          <select data-source-select>
-            ${d.sources.map((src, i) => `<option value="${julesEscape(src.id)}" ${i === 0 ? "selected" : ""}>${julesEscape(src.repo || src.title)}</option>`).join("")}
-          </select>
-          <textarea data-focus="prompt" data-prompt-input placeholder="Describe the task for Jules...">${julesEscape(this._promptDraft)}</textarea>
-          <div class="jules-createbtn" data-action="create">${this._icon("arrow-up", 15)}<span>Create session</span></div>
-        </div>
-        <div class="jules-note">${d.sources.some((s) => this._isSample(s.id)) ? "Показаны демо-данные. Подключите Jules API в настройках интеграции." : ""}</div>
-      </div>
-    `;
-  }
-
   _statsPanelHtml(d) {
     const sessions = d.sessions;
     const count = (pred) => sessions.filter(pred).length;
     const total = sessions.length;
     const stats = [
       { label: "In progress", n: count((s) => ["IN_PROGRESS", "QUEUED"].includes(s.state)), color: "#8ab4f8" },
-      { label: "Waiting for input", n: count((s) => s.state === "AWAITING_YOUR_INPUT"), color: "#f5a623" },
+      { label: "Waiting for input", n: count((s) => ["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"].includes(s.state)), color: "#f5a623" },
       { label: "Completed", n: count((s) => s.state === "COMPLETED"), color: "#34a853" },
       { label: "Paused", n: count((s) => s.state === "PAUSED"), color: "#9aa0a6" },
       { label: "Failed", n: count((s) => s.state === "FAILED"), color: "#f28b82" },
@@ -717,17 +730,6 @@ class JulesAgentCard extends HTMLElement {
         this._search = ev.target.value;
         this._focus = "search";
         this._render();
-      } else if (ev.target.matches("[data-chat-input]")) {
-        this._chatDraft = ev.target.value;
-      } else if (ev.target.matches("[data-prompt-input]")) {
-        this._promptDraft = ev.target.value;
-      }
-    });
-    this.card.addEventListener("keydown", (ev) => {
-      if (ev.key !== "Enter" || !ev.target.matches) return;
-      if (ev.target.matches("[data-chat-input]")) {
-        ev.preventDefault();
-        this._sendChatMessage();
       }
     });
   }
@@ -735,6 +737,12 @@ class JulesAgentCard extends HTMLElement {
   _handleClick(ev) {
     const d = this._data();
     const t = ev.target;
+
+    const mcpEl = t.closest(".jules-mcp");
+    if (mcpEl) {
+      mcpEl.classList.toggle("open");
+      return;
+    }
 
     const maction = t.closest("[data-maction]");
     if (maction) {
@@ -767,10 +775,6 @@ class JulesAgentCard extends HTMLElement {
         this._render();
       } else if (action === "close-chat") {
         this._closeChat();
-      } else if (action === "send-chat") {
-        this._sendChatMessage();
-      } else if (action === "create") {
-        this._createSession();
       } else if (action === "refresh") {
         this._refresh();
       } else if (action === "open-jules" && this._chatSession) {
