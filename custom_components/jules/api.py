@@ -149,6 +149,15 @@ class JulesApiClient:
                 state = (item.get("state", {}) or {}).get("state", "")
                 if state:
                     messages.append({"role": "system", "kind": "state", "text": state.replace("_", " ").title()})
+        if not messages and isinstance(data, dict) and data.get("activities"):
+            first = data["activities"][0]
+            _LOGGER.warning(
+                "Jules activities: %d items but nothing parsed for %s; first item keys: %s; body: %.500s",
+                len(data["activities"]),
+                session_id,
+                list(first.keys()) if isinstance(first, dict) else type(first).__name__,
+                str(first),
+            )
         return messages
 
     async def send_message(self, session_id: str, text: str) -> None:
