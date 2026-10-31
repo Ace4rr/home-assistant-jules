@@ -10,7 +10,7 @@ _Home Assistant Integration for Jules Agent._
 
 Supported Features:
  * Native backend integration (Python) communicating with the official Jules REST API (v1alpha, `jules.googleapis.com`).
- * Jules-style Lovelace card: sidebar with the logo, search, recent sessions and codebases; repo page with task input, suggestions, sessions and scheduled tasks; openable chat view with the "Talk to Jules" input.
+ * Jules-style multi-panel Lovelace card: logo rail, Sessions panel (with Scheduled), interactive chat panel (open/close dialogs, "Talk to Jules" input), "New session" panel (create tasks) and a Statistics panel with activity breakdown.
  * Standard HA entities: `sensor.jules_agent_status`, `sensor.jules_current_task`, `sensor.jules_sessions` (sessions + codebases as attributes), `sensor.jules_chat` (opened chat messages).
  * Services: `jules.load_chat`, `jules.send_message`, `jules.create_session` — the card wires them to chat opening, the chat input and the task input.
  * Safe storage of API keys on the server side.

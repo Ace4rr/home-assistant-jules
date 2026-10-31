@@ -11,23 +11,17 @@ const SAMPLE_SESSIONS = [
   { id: "sample/s3", title: "Ошибка custom element: jules-agent-card в Home Assistant", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
   { id: "sample/s4", title: "Fix register_static_path AttributeError in Jules Agent", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
   { id: "sample/s5", title: "Docker Compose файл для запуска инструмента", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
-  { id: "sample/s6", title: "Рефакторизация и профессиональное оформление", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
+  { id: "sample/s6", title: "Рефакторизация и профессиональное оформление", state: "IN_PROGRESS", updateTime: "", source_id: "sample/src-ha" },
   { id: "sample/s7", title: "Привет там указано про то что надо добавить сущность", state: "PAUSED", updateTime: "", source_id: "sample/src-ha" },
 ];
 
-const SAMPLE_SUGGESTIONS = [
-  "Missing tests for JulesTaskSensor",
-  "Untested API url formatting edge case",
-  "Missing tests for JulesApiClient",
-];
-
 const SAMPLE_SCHEDULED = [
-  { title: "Допиливание ReadMe чтобы оно точно соответствовало проекту - какую-то фигня с Licenses", when: "Once on 2026-10-30 at 03:00 AM" },
+  { title: "Допиливание ReadMe чтобы оно точно соответствовало проекту - фигня с Licenses", when: "Once on 2026-10-30 at 03:00 AM" },
   { title: "Напиши readme по типу как в https://github.com/meshtastic/home-assistant", when: "Once on 2026-10-26 at 11:30 AM" },
 ];
 
 const SAMPLE_MESSAGES = [
-  { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск приложения npm run start успешно проходят локально." },
+  { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск npm run start успешно проходят локально." },
   { role: "user", kind: "message", text: "Могу ли я считать эту задачу успешно завершенной?" },
   { role: "jules", kind: "message", text: "Да, задача выполнена. Все изменения закоммичены в текущей ветке (jules-6624644291350414200-a471c40f)." },
   { role: "user", kind: "message", text: "Сделай pull request, я смерджу и тогда да" },
@@ -36,7 +30,7 @@ const SAMPLE_MESSAGES = [
   { role: "jules", kind: "message", text: "Я отправил пуш и запрос на создание пулл-реквеста через специальный внутренний API. Проверьте, пожалуйста, появился ли pull-реквест в вашем репозитории." },
 ];
 
-const GH_SVG = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>';
+const GH_SVG = '<svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>';
 
 function julesEscape(text) {
   return String(text).replace(/[&<>"']/g, (c) => ({
@@ -64,16 +58,14 @@ class JulesAgentCard extends HTMLElement {
   constructor() {
     super();
     this._hass = null;
-    this._view = { type: "repo", source: null };
-    this._sidebarOpen = true;
+    this._chatSession = null;
     this._search = "";
     this._sessionsExpanded = false;
+    this._schedOpen = true;
     this._menuFor = null;
-    this._repoMenuOpen = false;
-    this._tab = "overview";
-    this._hiddenSources = [];
+    this._menuSession = null;
     this._pending = [];
-    this._taskDraft = "";
+    this._promptDraft = "";
     this._chatDraft = "";
     this._renderKey = "";
     this._focus = null;
@@ -91,8 +83,7 @@ class JulesAgentCard extends HTMLElement {
       ...config,
     };
     this._renderKey = "";
-    if (!this.isConnected) return;
-    this._render();
+    if (this.isConnected) this._render();
   }
 
   set hass(hass) {
@@ -107,10 +98,9 @@ class JulesAgentCard extends HTMLElement {
   }
 
   connectedCallback() {
-    if (!this._ro && typeof ResizeObserver === "function") {
-      this._ro = new ResizeObserver(() => this._updateWidthClass());
-      this._ro.observe(this);
-    }
+    // The card is light-DOM based, so ":host" styles do not apply — set block display explicitly.
+    this.style.display = "block";
+    if (this.config) this._render();
   }
 
   disconnectedCallback() {
@@ -119,7 +109,8 @@ class JulesAgentCard extends HTMLElement {
 
   _updateWidthClass() {
     if (!this.card) return;
-    this.card.classList.toggle("narrow", this.card.clientWidth < 620);
+    this.card.classList.toggle("narrow", this.card.clientWidth < 760);
+    this.card.classList.toggle("mid", this.card.clientWidth >= 760 && this.card.clientWidth < 980);
   }
 
   _attrs(entityId) {
@@ -146,11 +137,10 @@ class JulesAgentCard extends HTMLElement {
     return JSON.stringify([
       d.sessions.map((s) => [s.id, s.state, s.updateTime]),
       d.sources.map((s) => [s.id, s.title]),
-      c ? c.state : null,
-      d.chat.messages.length,
-      this._view, this._menuFor, this._repoMenuOpen, this._tab,
-      this._search, this._sessionsExpanded, this._sidebarOpen,
-      this._taskDraft, this._chatDraft, this._pending.length,
+      c ? c.state : null, d.chat.messages.length,
+      this._chatSession, this._menuFor, this._search,
+      this._sessionsExpanded, this._schedOpen,
+      this._promptDraft, this._chatDraft, this._pending.length,
     ]);
   }
 
@@ -160,17 +150,17 @@ class JulesAgentCard extends HTMLElement {
 
   _openChat(session) {
     this._menuFor = null;
-    this._view = { type: "chat", id: session.id, title: session.title };
+    this._chatSession = { id: session.id, title: session.title };
     if (!this._isSample(session.id) && this._hass && this._hass.callService) {
       this._hass.callService("jules", "load_chat", { session_id: session.id });
     }
     this._render();
   }
 
-  _openRepo(source) {
-    this._menuFor = null;
-    this._repoMenuOpen = false;
-    this._view = { type: "repo", source: source ? source.id : null };
+  _closeChat() {
+    this._chatSession = null;
+    this._pending = [];
+    this._chatDraft = "";
     this._render();
   }
 
@@ -188,13 +178,15 @@ class JulesAgentCard extends HTMLElement {
     }
   }
 
-  _sendTask(source) {
-    const input = this.card.querySelector("[data-task-input]");
-    const text = (input ? input.value : this._taskDraft).trim();
+  _createSession() {
+    const box = this.card.querySelector("[data-prompt-input]");
+    const sel = this.card.querySelector("[data-source-select]");
+    const text = (box ? box.value : this._promptDraft).trim();
+    const sourceId = sel ? sel.value : null;
     if (!text) return;
-    this._taskDraft = "";
-    if (source && !this._isSample(source.id) && this._hass.callService) {
-      this._hass.callService("jules", "create_session", { source_id: source.id, prompt: text });
+    this._promptDraft = "";
+    if (sourceId && !this._isSample(sourceId) && this._hass.callService) {
+      this._hass.callService("jules", "create_session", { source_id: sourceId, prompt: text });
     }
     this._render();
   }
@@ -202,26 +194,16 @@ class JulesAgentCard extends HTMLElement {
   _sendChatMessage() {
     const input = this.card.querySelector("[data-chat-input]");
     const text = (input ? input.value : this._chatDraft).trim();
-    if (!text) return;
+    if (!text || !this._chatSession) return;
     this._chatDraft = "";
-    const id = this._view.id;
+    const id = this._chatSession.id;
     if (id && !this._isSample(id) && this._hass.callService) {
       this._hass.callService("jules", "send_message", { session_id: id, text });
       this._pending.push({ role: "user", kind: "message", text });
     }
     this._render();
-    const box = this.card.querySelector(".jules-chat-scroll");
+    const box = this.card.querySelector(".jp-chat-scroll");
     if (box) box.scrollTop = box.scrollHeight;
-  }
-
-  _visibleSessions(d) {
-    const q = this._search.toLowerCase();
-    let list = d.sessions;
-    if (this._view.type === "repo" && this._view.source) {
-      list = list.filter((s) => s.source_id === this._view.source);
-    }
-    if (q) list = list.filter((s) => (s.title || "").toLowerCase().includes(q));
-    return list;
   }
 
   _render() {
@@ -231,27 +213,34 @@ class JulesAgentCard extends HTMLElement {
       this.card = document.createElement("ha-card");
       this.card.classList.add("jules-app");
       this.appendChild(this.card);
-      this._updateWidthClass();
+      if (!this._ro && typeof ResizeObserver === "function") {
+        this._ro = new ResizeObserver(() => this._updateWidthClass());
+        this._ro.observe(this.card);
+      }
     }
+    this.card.style.background = "#131314";
+    this.card.style.borderRadius = "16px";
+    this.card.style.overflow = "hidden";
 
     const d = this._data();
-    const currentSource = d.sources.find((s) => s.id === this._view.source) || null;
-    this._visibleSessions(d);
 
     this.card.innerHTML = `
       <style>${this._styles()}</style>
-      ${this._sidebarHtml(d)}
-      ${this._view.type === "repo" ? this._repoHtml(d, currentSource) : this._chatHtml(d)}
+      ${this._logoRailHtml()}
+      ${this._sessionsPanelHtml(d)}
+      ${this._chatPanelHtml(d)}
+      <div class="jules-right">
+        ${this._newTaskPanelHtml(d)}
+        ${this._statsPanelHtml(d)}
+      </div>
     `;
 
     this._appendMenu(d);
     this._attachEvents(d);
     this._updateWidthClass();
     this._restoreFocus();
-    if (this._view.type === "chat") {
-      const box = this.card.querySelector(".jules-chat-scroll");
-      if (box) box.scrollTop = box.scrollHeight;
-    }
+    const box = this.card.querySelector(".jp-chat-scroll");
+    if (box) box.scrollTop = box.scrollHeight;
   }
 
   _restoreFocus() {
@@ -260,7 +249,7 @@ class JulesAgentCard extends HTMLElement {
     if (el) {
       el.focus();
       const v = this._focus === "search" ? this._search
-        : this._focus === "task" ? this._taskDraft : this._chatDraft;
+        : this._focus === "prompt" ? this._promptDraft : this._chatDraft;
       try { el.setSelectionRange(v.length, v.length); } catch (e) { /* not a text field */ }
     }
     this._focus = null;
@@ -270,209 +259,165 @@ class JulesAgentCard extends HTMLElement {
     return `
       :host { display: block; }
       .jules-app {
-        position: relative; display: flex; overflow: hidden;
-        background: #131314; color: #e3e3e3; border-radius: 16px;
+        display: grid; grid-template-columns: 46px minmax(215px, 250px) minmax(280px, 1fr) 272px;
+        gap: 10px; padding: 10px;
+        background: #131314; color: #e3e3e3;
         font-family: 'Google Sans', Roboto, system-ui, -apple-system, sans-serif;
-        min-height: 540px; height: 640px;
+        height: 660px;
       }
+      .jules-app.narrow { grid-template-columns: 46px 1fr; grid-auto-rows: minmax(300px, auto); height: auto; }
+      .jules-app.narrow .jules-chat, .jules-app.narrow .jules-right { grid-column: 1 / -1; }
+      .jules-app.narrow .jules-right { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .jules-app.mid { grid-template-columns: 46px minmax(215px, 250px) 1fr; }
+      .jules-app.mid .jules-right { grid-column: 2 / 4; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
       .jules-app a { color: inherit; text-decoration: none; }
-      /* ---------- sidebar ---------- */
-      .jules-sidebar {
-        width: 250px; flex: none; display: flex; flex-direction: column;
-        background: #1b1c1e; transition: margin-left .2s;
+      .jules-rail {
+        background: #1b1c1e; border-radius: 14px; display: flex; flex-direction: column;
+        align-items: center; padding: 10px 0; gap: 10px;
       }
-      .jules-app.side-hidden .jules-sidebar { margin-left: -250px; }
-      .jules-app.narrow .jules-sidebar {
-        position: absolute; inset: 0 auto 0 0; z-index: 40;
-        box-shadow: 8px 0 24px rgba(0,0,0,.5); margin-left: -250px !important;
+      .jules-rail .logo {
+        width: 34px; height: 34px; border-radius: 10px; background: #715cd7;
+        display: flex; align-items: center; justify-content: center; color: #fff;
       }
-      .jules-app.narrow.side-open .jules-sidebar { margin-left: 0 !important; }
-      .jules-side-head {
-        display: flex; align-items: center; gap: 8px;
-        background: #715cd7; padding: 14px 12px 14px 16px; color: #fff;
+      .jules-rail .logo ha-icon { --mdc-icon-size: 22px; }
+      .jules-rail .line { flex: 1; width: 2px; border-radius: 2px; background: #26272a; }
+      .jules-panel {
+        background: #1b1c1e; border-radius: 14px; display: flex; flex-direction: column;
+        overflow: hidden; min-width: 0; min-height: 0;
       }
-      .jules-logo { font-size: 20px; font-weight: 600; letter-spacing: .2px; flex: 1; display: flex; align-items: center; gap: 8px; }
-      .jules-logo ha-icon { --mdc-icon-size: 22px; }
+      .jules-panel-head {
+        flex: none; display: flex; align-items: center; gap: 8px;
+        padding: 12px 14px 8px; font-size: 13.5px; color: #e3e3e3;
+      }
+      .jules-panel-head .t { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+      .jules-panel-head .cnt { background: #3c4043; border-radius: 10px; font-size: 11px; padding: 1px 8px; color: #c4c7c5; }
+      .jules-panel-head .x {
+        display: flex; align-items: center; justify-content: center;
+        width: 28px; height: 28px; border-radius: 50%; color: #9aa0a6; cursor: pointer; flex: none;
+      }
+      .jules-panel-head .x:hover { background: rgba(255,255,255,.08); color: #e3e3e3; }
       .jules-iconbtn {
         display: flex; align-items: center; justify-content: center;
-        width: 32px; height: 32px; border-radius: 50%; cursor: pointer; flex: none;
-        color: inherit; background: transparent; transition: background .15s;
+        width: 30px; height: 30px; border-radius: 50%; cursor: pointer; flex: none;
+        color: #9aa0a6; background: transparent;
       }
-      .jules-iconbtn:hover { background: rgba(255,255,255,.14); }
-      .jules-iconbtn.dark:hover { background: rgba(255,255,255,.08); }
+      .jules-iconbtn:hover { background: rgba(255,255,255,.08); color: #e3e3e3; }
       .jules-search {
-        margin: 12px; padding: 0 12px; display: flex; align-items: center; gap: 8px;
-        background: #2a2b2e; border-radius: 12px; height: 40px; flex: none;
+        flex: none; margin: 0 10px 8px; padding: 0 10px; display: flex; align-items: center; gap: 6px;
+        background: #26272a; border-radius: 10px; height: 34px; color: #8e918f;
       }
       .jules-search input {
         flex: 1; background: transparent; border: none; outline: none;
-        color: #e3e3e3; font-size: 13.5px; font-family: inherit; min-width: 0;
+        color: #e3e3e3; font-size: 13px; font-family: inherit; min-width: 0;
       }
       .jules-search input::placeholder { color: #8e918f; }
-      .jules-side-scroll { overflow-y: auto; flex: 1; padding-bottom: 12px; }
+      .jules-scroll { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: 8px; }
       .jules-sec {
         display: flex; align-items: center; justify-content: space-between;
-        color: #9aa0a6; font-size: 13px; padding: 8px 16px 6px; cursor: pointer;
+        color: #9aa0a6; font-size: 12.5px; padding: 8px 14px 4px; cursor: pointer;
       }
       .jules-sec:hover { color: #c4c7c5; }
       .jules-row {
-        display: flex; align-items: center; gap: 10px;
-        padding: 7px 10px 7px 16px; margin: 1px 6px 1px 6px; border-radius: 10px;
-        font-size: 13.5px; cursor: pointer; color: #c4c7c5;
+        display: flex; align-items: center; gap: 9px;
+        padding: 8px 10px 8px 14px; margin: 1px 8px; border-radius: 10px;
+        font-size: 13px; cursor: pointer; color: #c4c7c5;
       }
       .jules-row:hover { background: #26272a; }
       .jules-row.sel { background: #2a2b2e; color: #e3e3e3; }
-      .jules-row .t { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+      .jules-row .t { flex: 1; min-width: 0; }
+      .jules-row .t .ttl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .jules-row .t .sub {
+        display: flex; align-items: center; gap: 5px; color: #8e918f; font-size: 11.5px; margin-top: 1px;
+        white-space: nowrap; overflow: hidden;
+      }
       .jules-row ha-icon, .jules-row svg { flex: none; color: #8e918f; }
-      .jules-row .cnt {
-        flex: none; background: #3c4043; color: #c4c7c5; border-radius: 10px;
-        font-size: 11px; padding: 1px 7px;
-      }
-      .jules-viewmore { color: #9aa0a6; font-size: 13.5px; }
+      .jules-viewmore { color: #9aa0a6; font-size: 12.5px; }
       .jules-viewmore:hover { color: #e3e3e3; }
-      .jules-row.dim { opacity: .55; }
-      /* ---------- main ---------- */
-      .jules-main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-      .jules-main-scroll { overflow-y: auto; flex: 1; }
-      .jules-topbar {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 16px 4px; gap: 8px;
-      }
-      .jules-repo-chip {
-        display: flex; align-items: center; gap: 8px; cursor: pointer;
-        background: #1e1f20; border-radius: 10px; padding: 8px 12px;
-        font-size: 13.5px; color: #e3e3e3; max-width: 70%;
-      }
-      .jules-repo-chip:hover { background: #26272a; }
-      .jules-repo-chip .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .jules-conf { display: flex; align-items: center; gap: 6px; color: #9aa0a6; font-size: 13px; cursor: pointer; flex: none; }
-      .jules-conf:hover { color: #e3e3e3; }
-      .jules-taskbox {
-        margin: 12px 16px; display: flex; align-items: center; gap: 10px;
-        background: #1e1f20; border-radius: 14px; padding: 6px 6px 6px 16px;
-      }
-      .jules-taskbox input {
-        flex: 1; background: transparent; border: none; outline: none;
-        color: #e3e3e3; font-size: 14.5px; font-family: inherit; min-width: 0;
-      }
-      .jules-taskbox input::placeholder, .jules-chat-input input::placeholder { color: #8e918f; }
-      .jules-sendbtn {
-        flex: none; display: flex; align-items: center; justify-content: center;
-        width: 38px; height: 34px; border-radius: 10px; background: #333537;
-        color: #c4c7c5; cursor: pointer;
-      }
-      .jules-sendbtn:hover { background: #3c4043; }
-      .jules-tabs { display: flex; gap: 4px; padding: 4px 16px 10px; }
-      .jules-tab {
-        padding: 7px 14px; border-radius: 999px; font-size: 13px; cursor: pointer; color: #9aa0a6;
-      }
-      .jules-tab:hover { color: #e3e3e3; }
-      .jules-tab.on { background: #333537; color: #e3e3e3; }
-      .jules-panel {
-        background: #1b1c1e; border-radius: 16px; margin: 0 16px 14px; padding: 14px 4px 6px;
-      }
-      .jules-panel-head {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 0 14px 10px; font-size: 14px; color: #e3e3e3; gap: 8px;
-      }
-      .jules-panel-head .l { display: flex; align-items: center; gap: 10px; min-width: 0; }
-      .jules-panel-head .sub { color: #9aa0a6; font-size: 12.5px; cursor: pointer; flex: none; }
-      .jules-panel-head .sub:hover { color: #e3e3e3; }
-      .jules-chips { display: flex; gap: 8px; padding: 0 14px 12px; flex-wrap: wrap; }
-      .jules-chip {
-        display: flex; align-items: center; gap: 6px; font-size: 12.5px;
-        background: #2a2b2e; border-radius: 999px; padding: 6px 12px; cursor: pointer; color: #c4c7c5;
-      }
-      .jules-chip:hover { background: #333537; }
-      .jules-chip.on { background: #3c4043; }
-      .jules-item {
-        display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer;
-      }
-      .jules-item:hover { background: #222326; }
-      .jules-item .t { flex: 1; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-      .jules-item .s {
-        flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0;
-      }
-      .jules-item .s .t { white-space: normal; }
-      .jules-item .sub {
-        display: flex; align-items: center; gap: 6px; color: #9aa0a6; font-size: 12.5px;
-      }
-      .jules-badge {
-        flex: none; font-size: 12px; color: #c4c7c5; border: 1px solid #5f6368;
-        border-radius: 8px; padding: 2px 10px;
-      }
       .jules-dots {
         flex: none; display: flex; align-items: center; justify-content: center;
-        width: 30px; height: 30px; border-radius: 50%; color: #9aa0a6; cursor: pointer;
+        width: 26px; height: 26px; border-radius: 50%; color: #9aa0a6; cursor: pointer; margin: 0 -4px 0 2px;
       }
       .jules-dots:hover { background: rgba(255,255,255,.08); }
-      .jules-startbtn {
-        flex: none; background: #e3e3e3; color: #1b1c1e; font-size: 12.5px; font-weight: 500;
-        border-radius: 999px; padding: 6px 14px; cursor: pointer;
-      }
-      .jules-startbtn:hover { background: #fff; }
-      .jules-pencil {
-        flex: none; display: flex; align-items: center; justify-content: center;
-        width: 30px; height: 30px; border-radius: 50%; background: #715cd7; color: #fff; cursor: pointer;
-      }
-      .jules-pencil:hover { filter: brightness(1.1); }
-      .jules-x { flex: none; color: #9aa0a6; cursor: pointer; width: 24px; text-align: center; }
-      .jules-x:hover { color: #e3e3e3; }
-      .jules-bars { flex: none; color: #34a853; display: flex; align-items: flex-end; gap: 2px; height: 14px; }
-      .jules-bars i { width: 3px; background: #34a853; border-radius: 1px; display: block; }
-      /* ---------- menu ---------- */
-      .jules-menu {
-        position: fixed; z-index: 60; min-width: 190px; padding: 6px 0;
-        background: #2d2f31; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
-      }
-      .jules-menu-item { padding: 10px 16px; font-size: 13.5px; cursor: pointer; white-space: nowrap; }
-      .jules-menu-item:hover { background: #3c4043; }
-      .jules-backdrop { position: fixed; inset: 0; z-index: 50; background: transparent; }
-      /* ---------- chat ---------- */
-      .jules-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-      .jules-chat-top { padding: 12px 16px 8px; display: flex; align-items: flex-start; gap: 10px; }
-      .jules-chat-top .gh { color: #c4c7c5; display: flex; margin-top: 2px; }
-      .jules-chat-top .r { font-size: 13.5px; color: #9aa0a6; }
-      .jules-chat-top .ti { font-size: 14.5px; color: #e3e3e3; margin-top: 2px; }
-      .jules-chat-scroll { flex: 1; overflow-y: auto; padding: 8px 0 12px; }
+      .jules-chat { display: flex; flex-direction: column; min-width: 0; min-height: 0; flex: 1; }
+      .jules-chat .jules-empty { margin: auto; }
+      .jp-chat-scroll { flex: 1; overflow-y: auto; min-height: 0; }
       .jules-banner {
-        display: flex; align-items: center; gap: 10px; margin: 4px 16px 8px;
+        display: flex; align-items: center; gap: 10px; margin: 2px 12px 8px;
         background: rgba(245,166,35,.14); color: #f5a623; border-radius: 10px;
-        padding: 10px 12px; font-size: 13px;
+        padding: 9px 12px; font-size: 12.5px;
       }
       .jules-banner .t { flex: 1; }
-      .jules-msgs { max-width: 720px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+      .jules-msgs { max-width: 640px; margin: 0 auto; padding: 2px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
       .jules-msg { display: flex; gap: 10px; }
-      .jules-msg .av { flex: none; width: 26px; color: #c4c7c5; padding-top: 6px; }
+      .jules-msg .av { flex: none; width: 24px; color: #c4c7c5; padding-top: 5px; }
       .jules-msg .bubble {
-        background: #2a2b2e; border-radius: 14px; padding: 12px 16px;
-        font-size: 13.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+        background: #2a2b2e; border-radius: 14px; padding: 11px 14px;
+        font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
         max-width: 85%;
       }
       .jules-msg.user { justify-content: flex-end; }
       .jules-msg.user .bubble { background: #333537; }
       .jules-msg .mcpcall {
         display: flex; align-items: center; gap: 10px; background: #1e1f20;
-        border-radius: 12px; padding: 12px 16px; font-size: 13.5px; width: 100%;
+        border-radius: 12px; padding: 11px 14px; font-size: 13px; width: 100%;
       }
-      .jules-msg .mcpcall b { font-weight: 600; }
       .jules-msg .mcpcall .k { color: #9aa0a6; }
       .jules-chat-input {
-        display: flex; align-items: center; gap: 8px; margin: 0 16px 8px;
-        background: #1e1f20; border-radius: 999px; padding: 6px 8px 6px 16px;
+        flex: none; display: flex; align-items: center; gap: 8px; margin: 0 10px 6px;
+        background: #26272a; border-radius: 999px; padding: 5px 6px 5px 14px;
       }
       .jules-chat-input input {
         flex: 1; background: transparent; border: none; outline: none;
-        color: #e3e3e3; font-size: 14px; font-family: inherit; min-width: 0;
+        color: #e3e3e3; font-size: 13px; font-family: inherit; min-width: 0;
       }
-      .jules-chat-foot {
-        text-align: center; color: #8e918f; font-size: 11.5px; padding: 2px 12px 10px;
-      }
+      .jules-chat-input input::placeholder, .jules-taskbox textarea::placeholder { color: #8e918f; }
+      .jules-chat-foot { flex: none; text-align: center; color: #8e918f; font-size: 11px; padding: 0 10px 8px; }
       .jules-chat-foot a { text-decoration: underline; cursor: pointer; }
-      .jules-time { text-align: center; color: #8e918f; font-size: 12px; margin: 6px 0; }
-      .jules-empty { color: #8e918f; text-align: center; padding: 40px 20px; font-size: 13.5px; }
+      .jules-empty { color: #8e918f; text-align: center; padding: 40px 16px; font-size: 13px; }
+      .jules-empty ha-icon { --mdc-icon-size: 40px; display: block; margin: 0 auto 10px; color: #5f6368; }
+      .jules-sendbtn {
+        flex: none; display: flex; align-items: center; justify-content: center;
+        width: 32px; height: 30px; border-radius: 10px; background: #715cd7;
+        color: #fff; cursor: pointer;
+      }
+      .jules-sendbtn:hover { filter: brightness(1.12); }
+      .jules-right { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+      .jules-right .jules-panel { flex: 1; }
+      .jules-taskbox {
+        flex: none; display: flex; flex-direction: column; gap: 8px; margin: 0 12px 4px;
+      }
+      .jules-taskbox select {
+        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 10px;
+        height: 34px; padding: 0 10px; font-size: 12.5px; font-family: inherit; width: 100%;
+      }
+      .jules-taskbox textarea {
+        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 12px;
+        padding: 10px 12px; font-size: 12.5px; font-family: inherit; resize: none;
+        height: 74px; width: 100%; box-sizing: border-box;
+      }
+      .jules-createbtn {
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        background: #715cd7; color: #fff; border-radius: 999px; padding: 8px 0;
+        font-size: 13px; font-weight: 500; cursor: pointer;
+      }
+      .jules-createbtn:hover { filter: brightness(1.12); }
+      .jules-note { color: #8e918f; font-size: 11px; padding: 0 14px 8px; }
+      .jules-stat { display: flex; align-items: center; gap: 10px; padding: 5px 14px; font-size: 12.5px; color: #c4c7c5; }
+      .jules-stat .l { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+      .jules-stat .barwrap { flex: 1.2; height: 6px; border-radius: 3px; background: #26272a; overflow: hidden; }
+      .jules-stat .bar { height: 100%; border-radius: 3px; }
+      .jules-stat .n { flex: none; width: 26px; text-align: right; color: #9aa0a6; }
+      .jules-stat .src { display: flex; align-items: center; gap: 7px; min-width: 0; }
+      .jules-stat .src .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .jules-menu {
+        position: fixed; z-index: 60; min-width: 185px; padding: 6px 0;
+        background: #2d2f31; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
+      }
+      .jules-menu-item { padding: 9px 15px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+      .jules-menu-item:hover { background: #3c4043; }
+      .jules-backdrop { position: fixed; inset: 0; z-index: 50; background: transparent; }
       .jules-spinner {
-        width: 14px; height: 14px; border-radius: 50%; flex: none;
+        width: 13px; height: 13px; border-radius: 50%; flex: none;
         border: 2px solid rgba(138,180,248,.25); border-top-color: #8ab4f8;
         animation: jules-spin 1s linear infinite;
       }
@@ -481,7 +426,7 @@ class JulesAgentCard extends HTMLElement {
   }
 
   _icon(name, size) {
-    return `<ha-icon icon="mdi:${name}" style="--mdc-icon-size:${size || 18}px;"></ha-icon>`;
+    return `<ha-icon icon="mdi:${name}" style="--mdc-icon-size:${size || 16}px;"></ha-icon>`;
   }
 
   _stateIcon(state, size) {
@@ -490,13 +435,13 @@ class JulesAgentCard extends HTMLElement {
       case "QUEUED":
         return '<div class="jules-spinner"></div>';
       case "AWAITING_YOUR_INPUT":
-        return this._icon("alert-circle-outline", size || 16);
+        return this._icon("alert-circle-outline", size || 15);
       case "PAUSED":
-        return this._icon("pause-circle-outline", size || 16);
+        return this._icon("pause-circle-outline", size || 15);
       case "FAILED":
-        return this._icon("close-circle-outline", size || 16);
+        return this._icon("close-circle-outline", size || 15);
       default:
-        return this._icon("check-circle-outline", size || 16);
+        return this._icon("check-circle-outline", size || 15);
     }
   }
 
@@ -512,161 +457,101 @@ class JulesAgentCard extends HTMLElement {
     return map[state] || state || "Completed";
   }
 
-  _sidebarHtml(d) {
+  _logoRailHtml() {
+    return `
+      <div class="jules-rail">
+        <div class="logo" title="Jules">${this._icon("octopus", 22)}</div>
+        <div class="line"></div>
+      </div>
+    `;
+  }
+
+  _sessionsPanelHtml(d) {
     const q = this._search.toLowerCase();
     const sessions = d.sessions
-      .filter((s) => !q || (s.title || "").toLowerCase().includes(q));
-    const shown = this._sessionsExpanded ? sessions : sessions.slice(0, 6);
-    const repoCounts = {};
-    d.sessions.forEach((s) => {
-      if (s.source_id) repoCounts[s.source_id] = (repoCounts[s.source_id] || 0) + 1;
-    });
-    const sources = d.sources.filter((src) => !this._hiddenSources.includes(src.id))
-      .filter((src) => !q || (src.title || "").toLowerCase().includes(q));
-    const activeSrc = this._view.type === "repo" ? this._view.source : null;
-
-    return `
-      <div class="jules-sidebar">
-        <div class="jules-side-head">
-          <div class="jules-logo">${this._icon("octopus", 22)}<span>jules</span></div>
-          <div class="jules-iconbtn" data-action="toggle-sidebar" title="Показать/скрыть панель">
-            ${this._icon("dock-to-right", 20)}
-          </div>
-        </div>
-        <div class="jules-search">
-          <input data-focus="search" placeholder="Search for repo or sessions" value="${julesEscape(this._search)}">
-          ${this._icon("magnify", 18)}
-        </div>
-        <div class="jules-side-scroll">
-          <div class="jules-sec" data-action="toggle-sessions">Recent sessions</div>
-          ${shown.map((s, i) => `
-            <div class="jules-row ${this._view.type === "chat" && this._view.id === s.id ? "sel" : ""}"
-                 data-session="${julesEscape(s.id)}" data-idx="${i}">
-              ${this._stateIcon(s.state)}
-              <span class="t" title="${julesEscape(s.title)}">${julesEscape(s.title)}</span>
-            </div>`).join("")}
-          ${sessions.length > 6 || this._sessionsExpanded ? `
-            <div class="jules-row jules-viewmore" data-action="viewmore">
-              ${this._icon(this._sessionsExpanded ? "minus" : "plus", 18)}<span class="t">${this._sessionsExpanded ? "View less" : "View more"}</span>
-            </div>` : ""}
-          <div class="jules-sec">Codebases</div>
-          ${sources.map((src) => `
-            <div class="jules-row ${activeSrc === src.id && this._view.type === "repo" ? "sel" : ""}" data-source="${julesEscape(src.id)}">
-              ${GH_SVG}
-              <span class="t" title="${julesEscape(src.title)}">${julesEscape(src.title)}</span>
-              ${repoCounts[src.id] ? `<span class="cnt">${repoCounts[src.id]}</span>` : ""}
-            </div>`).join("")}
-        </div>
-      </div>
-    `;
-  }
-
-  _repoHtml(d, currentSource) {
-    const sessions = this._visibleSessions(d)
+      .filter((s) => !q || (s.title || "").toLowerCase().includes(q))
       .slice()
       .sort((a, b) => String(b.updateTime || "").localeCompare(String(a.updateTime || "")));
-    const shown = this._sessionsExpanded ? sessions : sessions.slice(0, 5);
-    const repoTitle = currentSource ? currentSource.repo : "All codebases";
+    const shown = this._sessionsExpanded ? sessions : sessions.slice(0, 7);
+    const repoById = {};
+    d.sources.forEach((s) => { repoById[s.id] = s; });
 
     return `
-      <div class="jules-main">
-        <div class="jules-topbar">
-          <div class="jules-repo-chip" data-menu="repo">
-            <span class="t">${julesEscape(repoTitle)}</span> ${this._icon("chevron-down", 18)}
+      <div class="jules-panel">
+        <div class="jules-panel-head">
+          <span class="t">Sessions</span>
+          <span class="cnt">${d.sessions.length}</span>
+          <span class="jules-iconbtn" data-action="refresh" title="Обновить">${this._icon("refresh", 16)}</span>
+        </div>
+        <div class="jules-search">
+          <input data-focus="search" placeholder="Search sessions" value="${julesEscape(this._search)}">
+          ${this._icon("magnify", 15)}
+        </div>
+        <div class="jules-scroll">
+          ${shown.map((s) => {
+            const repo = repoById[s.source_id];
+            return `
+            <div class="jules-row ${this._chatSession && this._chatSession.id === s.id ? "sel" : ""}"
+                 data-session="${julesEscape(s.id)}">
+              ${this._stateIcon(s.state)}
+              <div class="t">
+                <div class="ttl" title="${julesEscape(s.title)}">${julesEscape(s.title)}</div>
+                <div class="sub">${julesEscape(this._stateText(s.state))}${s.updateTime ? " · " + julesEscape(julesRelTime(s.updateTime)) : ""}${repo ? " · " + julesEscape(repo.repo.split("/")[1] || repo.repo) : ""}</div>
+              </div>
+              <span class="jules-dots" data-menu="${julesEscape(s.id)}">${this._icon("dots-horizontal", 16)}</span>
+            </div>`;
+          }).join("")}
+          ${sessions.length > 7 || this._sessionsExpanded ? `
+            <div class="jules-row jules-viewmore" data-action="viewmore">
+              ${this._icon(this._sessionsExpanded ? "minus" : "plus", 15)}<span class="t">${this._sessionsExpanded ? "View less" : "View more"}</span>
+            </div>` : ""}
+          <div class="jules-sec" data-action="toggle-sched">
+            <span>Scheduled</span>
+            ${this._icon(this._schedOpen ? "chevron-up" : "chevron-down", 16)}
           </div>
-          <a class="jules-conf" href="${julesEscape(this.config.url)}" target="_blank" rel="noopener">
-            Configure repo ${this._icon("cog-outline", 16)}
-          </a>
-        </div>
-        <div class="jules-taskbox">
-          <input data-focus="task" data-task-input placeholder="Write task..." value="${julesEscape(this._taskDraft)}">
-          <div class="jules-sendbtn" data-action="send-task" title="Start task">${this._icon("arrow-up", 18)}</div>
-        </div>
-        <div class="jules-tabs">
-          ${[["overview", "Codebase overview"], ["suggested", "Suggested"], ["scheduled", "Scheduled"]]
-            .map(([id, label]) => `<div class="jules-tab ${this._tab === id ? "on" : ""}" data-tab="${id}">${label}</div>`).join("")}
-        </div>
-        <div class="jules-main-scroll">
-          ${this._tab !== "scheduled" ? `
-          <div class="jules-panel">
-            <div class="jules-panel-head">
-              <div class="l">${this._icon("idea-outline", 18)}<span>Top suggestions to continuously improve your codebase</span></div>
-              <span class="sub">Configure suggestions</span>
-            </div>
-            ${SAMPLE_SUGGESTIONS.map((s) => `
-              <div class="jules-item">
-                <span class="t">${julesEscape(s)}</span>
-                <span class="jules-bars"><i style="height:5px"></i><i style="height:9px"></i><i style="height:14px"></i></span>
-                <span class="jules-startbtn" data-suggest="${julesEscape(s)}">Start</span>
-                <span class="jules-pencil">${this._icon("pencil", 15)}</span>
-                <span class="jules-x" title="Dismiss">${this._icon("close", 15)}</span>
-              </div>`).join("")}
-          </div>` : ""}
-          ${this._tab !== "suggested" && this._tab !== "scheduled" ? `
-          <div class="jules-panel">
-            <div class="jules-panel-head">
-              <div class="l">${this._icon("swap-vertical", 18)}<span>Sessions</span></div>
-            </div>
-            ${shown.length ? shown.map((s, i) => `
-              <div class="jules-item" data-session="${julesEscape(s.id)}" data-idx="m${i}">
-                <div class="s">
-                  <span class="t">${julesEscape(s.title)}</span>
-                  <span class="sub">${this._stateIcon(s.state, 13)} ${julesEscape(this._stateText(s.state))}${s.updateTime ? " " + julesEscape(julesRelTime(s.updateTime)) : ""}</span>
-                </div>
-                ${s.state === "PAUSED" ? '<span class="jules-badge">Paused</span>' : ""}
-                <span class="jules-dots" data-menu="m${i}">${this._icon("dots-horizontal", 18)}</span>
-              </div>`).join("") : '<div class="jules-empty">No sessions yet. Write a task above!</div>'}
-            ${sessions.length > 5 || this._sessionsExpanded ? `
-              <div class="jules-item jules-viewmore" data-action="viewmore">
-                <span class="t">${this._sessionsExpanded ? "View less" : "View more"}</span>
-              </div>` : ""}
-          </div>` : ""}
-          ${this._tab === "scheduled" ? `
-          <div class="jules-panel">
-            <div class="jules-panel-head">
-              <div class="l">${this._icon("clock-outline", 18)}<span>Scheduled</span></div>
-            </div>
-            ${SAMPLE_SCHEDULED.map((s, i) => `
-              <div class="jules-item">
-                <div class="s">
-                  <span class="t">${julesEscape(s.title)}</span>
-                  <span class="sub">${this._icon("chevron-right", 14)} ${julesEscape(s.when)}</span>
-                </div>
-                <span class="jules-dots" data-menu="s${i}">${this._icon("dots-horizontal", 18)}</span>
-              </div>`).join("")}
-          </div>` : ""}
+          ${this._schedOpen ? SAMPLE_SCHEDULED.map((s) => `
+            <div class="jules-row">
+              ${this._icon("clock-outline", 15)}
+              <div class="t">
+                <div class="ttl" title="${julesEscape(s.title)}">${julesEscape(s.title)}</div>
+                <div class="sub">${this._icon("chevron-right", 12)} ${julesEscape(s.when)}</div>
+              </div>
+            </div>`).join("") : ""}
         </div>
       </div>
     `;
   }
 
-  _chatHtml(d) {
-    const real = this._view.id && !this._isSample(this._view.id);
-    const loaded = d.chat.id === this._view.id;
-    const messages = real
-      ? (loaded ? d.chat.messages : [])
-      : SAMPLE_MESSAGES;
-    const session = d.sessions.find((s) => s.id === this._view.id) || {};
+  _chatPanelHtml(d) {
+    if (!this._chatSession) {
+      return `
+        <div class="jules-panel jules-chat">
+          <div class="jules-panel-head"><span class="t">Chat</span></div>
+          <div class="jules-empty">${this._icon("octopus", 40)}Select a session to open the chat</div>
+        </div>
+      `;
+    }
+    const real = !this._isSample(this._chatSession.id);
+    const loaded = d.chat.id === this._chatSession.id;
+    const messages = real ? (loaded ? d.chat.messages : []) : SAMPLE_MESSAGES;
+    const session = d.sessions.find((s) => s.id === this._chatSession.id) || {};
     const state = session.state || (real ? "" : "AWAITING_YOUR_INPUT");
     const all = [...messages, ...this._pending];
+    const repo = d.sources.find((s) => s.id === session.source_id);
 
     return `
-      <div class="jules-chat">
-        <div class="jules-chat-top">
-          <div class="jules-iconbtn dark" data-action="back" title="Назад">${this._icon("arrow-left", 20)}</div>
+      <div class="jules-panel jules-chat">
+        <div class="jules-panel-head">
           <span class="gh">${GH_SVG}</span>
-          <div style="flex:1;min-width:0">
-            <div class="r">${julesEscape(d.sources.find((s) => s.id === session.source_id)?.repo || "Jules")}</div>
-            <div class="ti">${julesEscape(this._view.title || "Session")}</div>
-          </div>
-          <div class="jules-iconbtn dark" data-menu="ctop" title="Меню">${this._icon("dots-horizontal", 20)}</div>
+          <span class="t" title="${julesEscape(this._chatSession.title)}">${julesEscape(repo ? repo.repo + " — " : "")}${julesEscape(this._chatSession.title)}</span>
+          <span class="jules-iconbtn" data-action="open-jules" title="Открыть в Jules">${this._icon("open-in-new", 15)}</span>
+          <span class="x" data-action="close-chat" title="Закрыть чат">${this._icon("close", 16)}</span>
         </div>
-        <div class="jules-chat-scroll">
+        <div class="jp-chat-scroll">
           ${state === "AWAITING_YOUR_INPUT" ? `
             <div class="jules-banner">
-              ${this._icon("alert-circle-outline", 16)}
+              ${this._icon("alert-circle-outline", 15)}
               <span class="t">Jules is waiting for your input to continue working</span>
-              ${this._icon("dots-horizontal", 16)}
             </div>` : ""}
           <div class="jules-msgs">
             ${all.length ? all.map((m) => this._messageHtml(m)).join("") : `
@@ -675,7 +560,7 @@ class JulesAgentCard extends HTMLElement {
         </div>
         <div class="jules-chat-input">
           <input data-focus="chat" data-chat-input placeholder="Talk to Jules" value="${julesEscape(this._chatDraft)}">
-          <div class="jules-sendbtn" data-action="send-chat" title="Send">${this._icon("arrow-up", 18)}</div>
+          <div class="jules-sendbtn" data-action="send-chat" title="Send">${this._icon("arrow-up", 16)}</div>
         </div>
         <div class="jules-chat-foot">Jules can make mistakes so double-check it and <a href="${julesEscape(this.config.url)}" target="_blank" rel="noopener">use code with caution</a></div>
       </div>
@@ -686,14 +571,7 @@ class JulesAgentCard extends HTMLElement {
     if (m.kind === "mcp") {
       return `
         <div class="jules-msg">
-          <div class="mcpcall">${this._icon("account-convert-outline", 18)} <span class="k">MCP Call</span> <b>connect</b> <span>Render</span></div>
-        </div>`;
-    }
-    if (m.kind === "plan") {
-      return `
-        <div class="jules-msg">
-          <div class="av">${this._icon("octopus", 20)}</div>
-          <div class="bubble">${julesEscape(m.text)}</div>
+          <div class="mcpcall">${this._icon("account-convert-outline", 16)} <span class="k">MCP Call</span> <b>${julesEscape(m.text.replace(/^MCP Call\s*/, ""))}</b></div>
         </div>`;
     }
     if (m.role === "user") {
@@ -701,9 +579,78 @@ class JulesAgentCard extends HTMLElement {
     }
     return `
       <div class="jules-msg">
-        <div class="av">${this._icon("octopus", 20)}</div>
+        <div class="av">${this._icon("octopus", 19)}</div>
         <div class="bubble">${julesEscape(m.text)}</div>
       </div>`;
+  }
+
+  _newTaskPanelHtml(d) {
+    return `
+      <div class="jules-panel">
+        <div class="jules-panel-head">
+          ${this._icon("plus", 16)}<span class="t">New session</span>
+        </div>
+        <div class="jules-taskbox">
+          <select data-source-select>
+            ${d.sources.map((src, i) => `<option value="${julesEscape(src.id)}" ${i === 0 ? "selected" : ""}>${julesEscape(src.repo || src.title)}</option>`).join("")}
+          </select>
+          <textarea data-focus="prompt" data-prompt-input placeholder="Describe the task for Jules...">${julesEscape(this._promptDraft)}</textarea>
+          <div class="jules-createbtn" data-action="create">${this._icon("arrow-up", 15)}<span>Create session</span></div>
+        </div>
+        <div class="jules-note">${d.sources.some((s) => this._isSample(s.id)) ? "Показаны демо-данные. Подключите Jules API в настройках интеграции." : ""}</div>
+      </div>
+    `;
+  }
+
+  _statsPanelHtml(d) {
+    const sessions = d.sessions;
+    const count = (pred) => sessions.filter(pred).length;
+    const total = sessions.length;
+    const stats = [
+      { label: "In progress", n: count((s) => ["IN_PROGRESS", "QUEUED"].includes(s.state)), color: "#8ab4f8" },
+      { label: "Waiting for input", n: count((s) => s.state === "AWAITING_YOUR_INPUT"), color: "#f5a623" },
+      { label: "Completed", n: count((s) => s.state === "COMPLETED"), color: "#34a853" },
+      { label: "Paused", n: count((s) => s.state === "PAUSED"), color: "#9aa0a6" },
+      { label: "Failed", n: count((s) => s.state === "FAILED"), color: "#f28b82" },
+    ];
+    const max = Math.max(1, ...stats.map((s) => s.n));
+    const perRepo = {};
+    sessions.forEach((s) => {
+      if (s.source_id) perRepo[s.source_id] = (perRepo[s.source_id] || 0) + 1;
+    });
+    const repoById = {};
+    d.sources.forEach((s) => { repoById[s.id] = s; });
+    const times = sessions.map((s) => s.updateTime).filter(Boolean).sort();
+    const last = times.length ? times[times.length - 1] : "";
+
+    return `
+      <div class="jules-panel">
+        <div class="jules-panel-head">
+          ${this._icon("chart-box-outline", 16)}<span class="t">Statistics</span>
+        </div>
+        <div class="jules-scroll">
+          ${stats.map((s) => `
+            <div class="jules-stat">
+              <div class="l">${this._stateIcon(s.label === "In progress" ? "IN_PROGRESS" : s.label === "Waiting for input" ? "AWAITING_YOUR_INPUT" : s.label === "Completed" ? "COMPLETED" : s.label === "Paused" ? "PAUSED" : "FAILED", 14)}<span>${s.label}</span></div>
+              <div class="barwrap"><div class="bar" style="width:${Math.round((s.n / max) * 100)}%;background:${s.color}"></div></div>
+              <span class="n">${s.n}</span>
+            </div>`).join("")}
+          <div class="jules-sec">By codebase</div>
+          ${Object.entries(perRepo).sort((a, b) => b[1] - a[1]).map(([srcId, n]) => {
+            const repo = repoById[srcId];
+            return `
+            <div class="jules-stat">
+              <div class="l src">${GH_SVG}<span class="t" title="${julesEscape(repo ? repo.repo : srcId)}">${julesEscape(repo ? repo.repo.split("/")[1] || repo.repo : srcId)}</span></div>
+              <span class="n">${n}</span>
+            </div>`;
+          }).join("")}
+          <div class="jules-sec">Latest activity</div>
+          <div class="jules-stat">
+            <div class="l">${this._icon("history", 14)}<span>${last ? julesEscape(julesRelTime(last)) : "—"}</span></div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   _appendMenu(d) {
@@ -711,45 +658,20 @@ class JulesAgentCard extends HTMLElement {
     const anchor = this.card.querySelector(`[data-menu="${this._menuFor}"]`);
     if (!anchor) { this._menuFor = null; return; }
     const r = anchor.getBoundingClientRect();
-    const items = this._menuItems(d, this._menuFor);
-    if (!items) { this._menuFor = null; return; }
-    const left = Math.max(8, r.right - 190);
+    const session = d.sessions.find((s) => s.id === this._menuFor);
+    if (!session) { this._menuFor = null; return; }
+    this._menuSession = session;
+    const left = Math.max(8, r.right - 185);
     const wrap = document.createElement("div");
     wrap.innerHTML = `
       <div class="jules-backdrop" data-action="close-menu"></div>
       <div class="jules-menu" style="left:${left}px;top:${r.bottom + 6}px">
-        ${items.map((it) => `<div class="jules-menu-item" data-maction="${it.action}" data-mkey="${julesEscape(this._menuFor)}"${it.src ? ` data-msrc="${julesEscape(it.src.id)}"` : ""}>${julesEscape(it.label)}</div>`).join("")}
+        <div class="jules-menu-item" data-maction="chat">Открыть чат</div>
+        <div class="jules-menu-item" data-maction="openjules">Открыть в Jules</div>
+        <div class="jules-menu-item" data-maction="refresh">Обновить данные</div>
       </div>
     `;
     while (wrap.firstChild) this.card.appendChild(wrap.firstChild);
-  }
-
-  _menuItems(d, key) {
-    if (key === "ctop") {
-      return [
-        { action: "openjules", label: "Открыть в Jules" },
-        { action: "refresh", label: "Обновить данные" },
-      ];
-    }
-    if (key === "repo") {
-      return d.sources.map((src) => ({ action: "repo", label: src.title, src }));
-    }
-    const id = String(key);
-    let session = null;
-    if (id.startsWith("m")) {
-      session = this._visibleSessions(d)
-        .slice()
-        .sort((a, b) => String(b.updateTime || "").localeCompare(String(a.updateTime || "")))[Number(id.slice(1))];
-    } else {
-      session = d.sessions[Number(id)];
-    }
-    if (!session) return null;
-    this._menuSession = session;
-    return [
-      { action: "chat", label: "Открыть чат" },
-      { action: "openjules", label: "Открыть в Jules" },
-      { action: "refresh", label: "Обновить данные" },
-    ];
   }
 
   _attachEvents(d) {
@@ -759,29 +681,8 @@ class JulesAgentCard extends HTMLElement {
     qa("[data-session]").forEach((el) => {
       el.addEventListener("click", (ev) => {
         if (ev.target.closest("[data-menu]")) return;
-        const id = el.dataset.session;
-        const session = d.sessions.find((s) => s.id === id);
+        const session = d.sessions.find((s) => s.id === el.dataset.session);
         if (session) this._openChat(session);
-      });
-    });
-
-    qa("[data-source]").forEach((el) => {
-      el.addEventListener("click", () => {
-        const src = d.sources.find((s) => s.id === el.dataset.source);
-        if (src) this._openRepo(src);
-      });
-    });
-
-    qa("[data-tab]").forEach((el) => {
-      el.addEventListener("click", () => { this._tab = el.dataset.tab; this._render(); });
-    });
-
-    qa("[data-suggest]").forEach((el) => {
-      el.addEventListener("click", () => {
-        const src = d.sources.find((s) => s.id === this._view.source) || d.sources[0];
-        if (src && !this._isSample(src.id) && this._hass.callService) {
-          this._hass.callService("jules", "create_session", { source_id: src.id, prompt: el.dataset.suggest });
-        }
       });
     });
 
@@ -794,18 +695,15 @@ class JulesAgentCard extends HTMLElement {
       });
     }
 
-    const taskInput = q("[data-task-input]");
-    if (taskInput) {
-      taskInput.addEventListener("input", () => { this._taskDraft = taskInput.value; });
-      taskInput.addEventListener("keydown", (ev) => { if (ev.key === "Enter") this._sendTask(d.sources.find((s) => s.id === this._view.source)); });
-      taskInput.addEventListener("focus", () => { this._focus = "task"; });
+    const promptBox = q("[data-prompt-input]");
+    if (promptBox) {
+      promptBox.addEventListener("input", () => { this._promptDraft = promptBox.value; });
     }
 
     const chatInput = q("[data-chat-input]");
     if (chatInput) {
       chatInput.addEventListener("input", () => { this._chatDraft = chatInput.value; });
       chatInput.addEventListener("keydown", (ev) => { if (ev.key === "Enter") this._sendChatMessage(); });
-      chatInput.addEventListener("focus", () => { this._focus = "chat"; });
     }
 
     qa("[data-menu]").forEach((el) => {
@@ -820,12 +718,10 @@ class JulesAgentCard extends HTMLElement {
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
         const action = el.dataset.maction;
-        const key = el.dataset.mkey;
         this._menuFor = null;
         if (action === "refresh") this._refresh();
-        else if (action === "chat") { const s = this._menuSession; if (s) this._openChat(s); }
-        else if (action === "openjules") { const s = this._menuSession || { id: this._view.id }; if (s) this._openJules(s); }
-        else if (action === "repo") { this._view = { type: "repo", source: el.dataset.msrc || null }; }
+        else if (action === "chat" && this._menuSession) this._openChat(this._menuSession);
+        else if (action === "openjules" && this._menuSession) this._openJules(this._menuSession);
         this._render();
       });
     });
@@ -835,21 +731,22 @@ class JulesAgentCard extends HTMLElement {
 
     qa("[data-action]").forEach((el) => {
       const action = el.dataset.action;
-      if (["close-menu"].includes(action)) return;
+      if (action === "close-menu") return;
       el.addEventListener("click", () => {
-        if (action === "toggle-sidebar") {
-          if (this.card.classList.contains("narrow")) this.card.classList.toggle("side-open");
-          else this.card.classList.toggle("side-hidden");
-        } else if (action === "toggle-sessions") {
+        if (action === "viewmore") {
           this._sessionsExpanded = !this._sessionsExpanded; this._render();
-        } else if (action === "viewmore") {
-          this._sessionsExpanded = !this._sessionsExpanded; this._render();
-        } else if (action === "back") {
-          this._view = { type: "repo", source: this._view.source }; this._render();
-        } else if (action === "send-task") {
-          this._sendTask(d.sources.find((s) => s.id === this._view.source));
+        } else if (action === "toggle-sched") {
+          this._schedOpen = !this._schedOpen; this._render();
+        } else if (action === "close-chat") {
+          this._closeChat();
         } else if (action === "send-chat") {
           this._sendChatMessage();
+        } else if (action === "create") {
+          this._createSession();
+        } else if (action === "refresh") {
+          this._refresh();
+        } else if (action === "open-jules" && this._chatSession) {
+          this._openJules(this._chatSession);
         }
       });
     });
@@ -870,5 +767,5 @@ window.customCards.push({
   type: "jules-agent-card",
   name: "Jules Agent Card",
   preview: true,
-  description: "Full Jules interface: sessions, codebases and chats",
+  description: "Jules multi-panel interface: sessions, chats, new tasks and statistics",
 });
