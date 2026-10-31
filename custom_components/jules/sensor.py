@@ -19,6 +19,7 @@ from .const import (
     STATE_FAILED,
     STATE_IN_PROGRESS,
     STATE_PAUSED,
+    STATE_QUEUED,
 )
 
 _LOGGER = logging.getLogger(__name__)
