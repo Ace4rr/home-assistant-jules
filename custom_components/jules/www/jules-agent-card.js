@@ -236,7 +236,7 @@ class JulesAgentCard extends HTMLElement {
       }
     }
     this.card.style.background = "#131314";
-    this.card.style.borderRadius = "16px";
+    this.card.style.borderRadius = "10px";
     this.card.style.overflow = "hidden";
 
     const d = this._data();
@@ -293,13 +293,13 @@ class JulesAgentCard extends HTMLElement {
         align-items: center; padding: 10px 0; gap: 10px;
       }
       .jules-rail .logo {
-        width: 34px; height: 34px; border-radius: 10px; background: #715cd7;
+        width: 34px; height: 34px; border-radius: 7px; background: #715cd7;
         display: flex; align-items: center; justify-content: center; color: #fff;
       }
       .jules-rail .logo ha-icon { --mdc-icon-size: 22px; }
       .jules-rail .line { flex: 1; width: 2px; border-radius: 2px; background: #26272a; }
       .jules-panel {
-        background: #1b1c1e; border-radius: 14px; display: flex; flex-direction: column;
+        background: #1b1c1e; border-radius: 8px; display: flex; flex-direction: column;
         overflow: hidden; min-width: 0; min-height: 0;
       }
       .jules-panel-head {
@@ -321,7 +321,7 @@ class JulesAgentCard extends HTMLElement {
       .jules-iconbtn:hover { background: rgba(255,255,255,.08); color: #e3e3e3; }
       .jules-search {
         flex: none; margin: 0 10px 8px; padding: 0 10px; display: flex; align-items: center; gap: 6px;
-        background: #26272a; border-radius: 10px; height: 34px; color: #8e918f;
+        background: #26272a; border-radius: 6px; height: 34px; color: #8e918f;
       }
       .jules-search input {
         flex: 1; background: transparent; border: none; outline: none;
@@ -336,7 +336,7 @@ class JulesAgentCard extends HTMLElement {
       .jules-sec:hover { color: #c4c7c5; }
       .jules-row {
         display: flex; align-items: center; gap: 9px;
-        padding: 8px 10px 8px 14px; margin: 1px 8px; border-radius: 10px;
+        padding: 8px 10px 8px 14px; margin: 1px 8px; border-radius: 5px;
         font-size: 13px; cursor: pointer; color: #c4c7c5;
       }
       .jules-row:hover { background: #26272a; }
@@ -360,7 +360,7 @@ class JulesAgentCard extends HTMLElement {
       .jp-chat-scroll { flex: 1; overflow-y: auto; min-height: 0; }
       .jules-banner {
         display: flex; align-items: center; gap: 10px; margin: 2px 12px 8px;
-        background: rgba(245,166,35,.14); color: #f5a623; border-radius: 10px;
+        background: rgba(245,166,35,.14); color: #f5a623; border-radius: 6px;
         padding: 9px 12px; font-size: 12.5px;
       }
       .jules-banner .t { flex: 1; }
@@ -369,7 +369,7 @@ class JulesAgentCard extends HTMLElement {
       .jules-msg { display: flex; gap: 10px; }
       .jules-msg .av { flex: none; width: 24px; color: #c4c7c5; padding-top: 5px; }
       .jules-msg .bubble {
-        background: #2a2b2e; border-radius: 14px; padding: 11px 14px;
+        background: #2a2b2e; border-radius: 9px; padding: 11px 14px;
         font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
         max-width: 85%;
       }
@@ -377,12 +377,12 @@ class JulesAgentCard extends HTMLElement {
       .jules-msg.user .bubble { background: #333537; }
       .jules-msg .mcpcall {
         display: flex; align-items: center; gap: 10px; background: #1e1f20;
-        border-radius: 12px; padding: 11px 14px; font-size: 13px; width: 100%;
+        border-radius: 7px; padding: 11px 14px; font-size: 13px; width: 100%;
       }
       .jules-msg .mcpcall .k { color: #9aa0a6; }
       .jules-chat-input {
         flex: none; display: flex; align-items: center; gap: 8px; margin: 0 10px 6px;
-        background: #26272a; border-radius: 999px; padding: 5px 6px 5px 14px;
+        background: #26272a; border-radius: 8px; padding: 5px 6px 5px 14px;
       }
       .jules-chat-input input {
         flex: 1; background: transparent; border: none; outline: none;
@@ -395,7 +395,7 @@ class JulesAgentCard extends HTMLElement {
       .jules-empty ha-icon { --mdc-icon-size: 40px; display: block; margin: 0 auto 10px; color: #5f6368; }
       .jules-sendbtn {
         flex: none; display: flex; align-items: center; justify-content: center;
-        width: 32px; height: 30px; border-radius: 10px; background: #715cd7;
+        width: 32px; height: 30px; border-radius: 6px; background: #715cd7;
         color: #fff; cursor: pointer;
       }
       .jules-sendbtn:hover { filter: brightness(1.12); }
@@ -405,17 +405,17 @@ class JulesAgentCard extends HTMLElement {
         flex: none; display: flex; flex-direction: column; gap: 8px; margin: 0 12px 4px;
       }
       .jules-taskbox select {
-        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 10px;
+        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 6px;
         height: 34px; padding: 0 10px; font-size: 12.5px; font-family: inherit; width: 100%;
       }
       .jules-taskbox textarea {
-        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 12px;
+        background: #26272a; color: #e3e3e3; border: none; outline: none; border-radius: 7px;
         padding: 10px 12px; font-size: 12.5px; font-family: inherit; resize: none;
         height: 74px; width: 100%; box-sizing: border-box;
       }
       .jules-createbtn {
         display: flex; align-items: center; justify-content: center; gap: 6px;
-        background: #715cd7; color: #fff; border-radius: 999px; padding: 8px 0;
+        background: #715cd7; color: #fff; border-radius: 7px; padding: 8px 0;
         font-size: 13px; font-weight: 500; cursor: pointer;
       }
       .jules-createbtn:hover { filter: brightness(1.12); }
@@ -429,7 +429,7 @@ class JulesAgentCard extends HTMLElement {
       .jules-stat .src .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .jules-menu {
         position: fixed; z-index: 60; min-width: 185px; padding: 6px 0;
-        background: #2d2f31; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
+        background: #2d2f31; border-radius: 7px; box-shadow: 0 6px 20px rgba(0,0,0,.5);
       }
       .jules-menu-item { padding: 9px 15px; font-size: 13px; cursor: pointer; white-space: nowrap; }
       .jules-menu-item:hover { background: #3c4043; }

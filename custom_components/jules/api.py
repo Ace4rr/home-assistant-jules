@@ -69,19 +69,35 @@ class JulesApiClient:
         """List connected codebases (GitHub repos)."""
         data = await self._request("GET", "/sources")
         sources = []
+        seen = set()
         for item in data.get("sources", []) or []:
             name = item.get("name", "")
-            gh = item.get("githubRepo", {}) or {}
-            owner, repo_name = gh.get("owner", ""), gh.get("name", "")
-            repo = "/".join(str(p) for p in (owner, repo_name) if p)
-            if not repo and repo_name and "/" in str(repo_name):
-                repo = str(repo_name)
+            gh = item.get("githubRepo") or {}
+            if not isinstance(gh, dict):
+                gh = {}
+            owner = gh.get("owner")
+            if isinstance(owner, dict):
+                owner = owner.get("username") or owner.get("login") or owner.get("name") or ""
+            owner = str(owner or "")
+            repo_name = str(gh.get("name") or gh.get("repository") or "")
+            if "/" in repo_name:
+                owner_part, _, name_part = repo_name.rpartition("/")
+                owner = owner or owner_part
+                repo_name = name_part
+            repo = "/".join(p for p in (owner, repo_name) if p)
+            if not repo:
+                repo = item.get("title") or name
+                _LOGGER.warning("Jules sources: cannot parse repo from item: %.300s", str(item))
+            key = repo or name
+            if key in seen:
+                continue
+            seen.add(key)
             sources.append(
                 {
                     "id": name,
                     "title": item.get("title") or repo or name,
-                    "repo": repo or item.get("title") or name,
-                    "branch": gh.get("defaultBranch", "main") if isinstance(gh, dict) else "main",
+                    "repo": repo,
+                    "branch": gh.get("defaultBranch", "main"),
                 }
             )
         return sources
@@ -120,7 +136,6 @@ class JulesApiClient:
                 str(data),
             )
         messages = []
-        seen_changes = set()
         for item in data.get("activities", []) or []:
             originator = item.get("originator", "agent")
 
@@ -167,12 +182,10 @@ class JulesApiClient:
                     )
                     for line in patch.splitlines():
                         if line.startswith("diff --git ") and " b/" in line:
-                            files.add(line.rsplit(" b/", 1)[-1].strip())
-                label = "Изменения кода: " + ", ".join(sorted(files)[:6])
-                if label in seen_changes:
-                    continue
-                seen_changes.add(label)
-                messages.append({"role": "system", "kind": "changes", "text": label})
+                            f = line.rsplit(" b/", 1)[-1].strip()
+                            if f and "__pycache__" not in f and not f.endswith(".pyc"):
+                                files.add(f)
+                messages.append({"role": "system", "kind": "changes", "files": sorted(files)})
 
             elif "mcpCall" in item:
                 call = item.get("mcpCall", {}) or {}
@@ -188,7 +201,23 @@ class JulesApiClient:
 
             # progressUpdated and other no-content activities are skipped
 
-        if not messages and isinstance(data, dict) and data.get("activities"):
+        # Collapse runs of artifacts activities into a single row with the
+        # final file set, and drop rows without files.
+        collapsed: list[dict[str, Any]] = []
+        for m in messages:
+            if m.get("kind") == "changes" and collapsed and collapsed[-1].get("kind") == "changes":
+                collapsed[-1]["files"] = m["files"]
+            else:
+                collapsed.append(m)
+        result = []
+        for m in collapsed:
+            if m.get("kind") == "changes":
+                if not m.get("files"):
+                    continue
+                m["text"] = "Изменения кода: " + ", ".join(m["files"][:6])
+            result.append(m)
+
+        if not result and isinstance(data, dict) and data.get("activities"):
             first = data["activities"][0]
             _LOGGER.warning(
                 "Jules activities: %d items but nothing parsed for %s; first item keys: %s; body: %.500s",
@@ -197,7 +226,7 @@ class JulesApiClient:
                 list(first.keys()) if isinstance(first, dict) else type(first).__name__,
                 str(first),
             )
-        return messages
+        return result
 
     async def send_message(self, session_id: str, text: str) -> None:
         """Send a user message to a session."""
