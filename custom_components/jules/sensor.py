@@ -169,4 +169,5 @@ class JulesChatSensor(SensorEntity):
             "session_id": chat.get("session_id"),
             "title": chat.get("title", ""),
             ATTR_MESSAGES: chat.get("messages", []),
+            "error": chat.get("error"),
         }

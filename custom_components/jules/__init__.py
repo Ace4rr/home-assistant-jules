@@ -27,6 +27,8 @@ from .const import (
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
+_LOGGER = logging.getLogger(__name__)
+
 SERVICE_LOAD_CHAT_SCHEMA = vol.Schema(
     {vol.Required("session_id"): cv.string}
 )
@@ -92,8 +94,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except JulesApiError as err:
             _LOGGER.error("Failed to load chat %s: %s", session_id, err)
             messages = []
+            error = str(err)
+        else:
+            error = None
         store = hass.data[DOMAIN][entry.entry_id]["chat"]
-        store.update({"session_id": session_id, "title": session_id, "messages": messages})
+        store.update({"session_id": session_id, "title": session_id, "messages": messages, "error": error})
         entity = hass.data[DOMAIN][entry.entry_id]["entities"].get("chat")
         if entity:
             entity.async_write_ha_state()

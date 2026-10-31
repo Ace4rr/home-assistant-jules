@@ -95,7 +95,7 @@ class JulesAgentCard extends HTMLElement {
       chat_entity: "sensor.jules_chat",
       status_entity: "sensor.jules_agent_status",
       task_entity: "sensor.jules_current_task",
-      height: "660px",
+      height: "clamp(640px, calc(100vh - 130px), 1080px)",
       ...config,
     };
     this._renderKey = "";
@@ -143,6 +143,7 @@ class JulesAgentCard extends HTMLElement {
       id: cAttrs.session_id || null,
       title: cAttrs.title || "",
       messages: Array.isArray(cAttrs.messages) ? cAttrs.messages : [],
+      error: cAttrs.error || "",
     };
     return { sessions, sources, chat };
   }
@@ -363,6 +364,7 @@ class JulesAgentCard extends HTMLElement {
         padding: 9px 12px; font-size: 12.5px;
       }
       .jules-banner .t { flex: 1; }
+      .jules-banner.err { background: rgba(242,139,130,.14); color: #f28b82; }
       .jules-msgs { max-width: 640px; margin: 0 auto; padding: 2px 14px 12px; display: flex; flex-direction: column; gap: 10px; }
       .jules-msg { display: flex; gap: 10px; }
       .jules-msg .av { flex: none; width: 24px; color: #c4c7c5; padding-top: 5px; }
@@ -568,6 +570,11 @@ class JulesAgentCard extends HTMLElement {
           <span class="x" data-action="close-chat" title="Закрыть чат">${this._icon("close", 16)}</span>
         </div>
         <div class="jp-chat-scroll">
+          ${d.chat.error && real && loaded ? `
+            <div class="jules-banner err">
+              ${this._icon("alert-circle-outline", 15)}
+              <span class="t">Не удалось загрузить чат: ${julesEscape(d.chat.error)}</span>
+            </div>` : ""}
           ${state === "AWAITING_YOUR_INPUT" ? `
             <div class="jules-banner">
               ${this._icon("alert-circle-outline", 15)}

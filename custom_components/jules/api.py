@@ -72,13 +72,16 @@ class JulesApiClient:
         for item in data.get("sources", []) or []:
             name = item.get("name", "")
             gh = item.get("githubRepo", {}) or {}
-            repo = "/".join(p for p in (gh.get("owner", ""), gh.get("name", "")) if p)
+            owner, repo_name = gh.get("owner", ""), gh.get("name", "")
+            repo = "/".join(str(p) for p in (owner, repo_name) if p)
+            if not repo and repo_name and "/" in str(repo_name):
+                repo = str(repo_name)
             sources.append(
                 {
                     "id": name,
                     "title": item.get("title") or repo or name,
-                    "repo": repo,
-                    "branch": gh.get("defaultBranch", "main"),
+                    "repo": repo or item.get("title") or name,
+                    "branch": gh.get("defaultBranch", "main") if isinstance(gh, dict) else "main",
                 }
             )
         return sources
@@ -92,8 +95,8 @@ class JulesApiClient:
             source_id = None
             ctx = item.get("sourceContext", {}) or {}
             srcs = ctx.get("sources", []) or []
-            if srcs:
-                source_id = srcs[0].get("source")
+            if srcs and isinstance(srcs[0], dict):
+                source_id = srcs[0].get("source") or srcs[0].get("name")
             sessions.append(
                 {
                     "id": name,
@@ -109,6 +112,13 @@ class JulesApiClient:
         """List chat activities (messages, plans, MCP calls) of a session."""
         path = f"/{session_id}/activities" if not session_id.startswith("/") else f"{session_id}/activities"
         data = await self._request("GET", path, params={"pageSize": 100})
+        if not isinstance(data, dict) or "activities" not in data:
+            _LOGGER.warning(
+                "Jules API activities response for %s has unexpected shape (keys: %s, body: %.300s)",
+                session_id,
+                list(data.keys()) if isinstance(data, dict) else type(data).__name__,
+                str(data),
+            )
         messages = []
         for item in data.get("activities", []) or []:
             originator = item.get("originator", "agent")
