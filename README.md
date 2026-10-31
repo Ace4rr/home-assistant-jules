@@ -1,6 +1,6 @@
 # Jules Agent
 
-[![GitHub Release](https://img.shields.io/github/v/release/Ace4rr/home-assistant-jules?style=for-the-badge)](https://github.com/Ace4rr/home-assistant-jules/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/Ace4rr/home-assistant-jules?style=for-the-badge)](https://github.com/Ace4rr/home-assistant-jules/releases/tag/v0.0.1)
 [![License](https://img.shields.io/github/license/Ace4rr/home-assistant-jules?style=for-the-badge)](LICENSE)
 
 [![hacs](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://hacs.xyz/docs/faq/custom_repositories)
