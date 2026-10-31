@@ -70,6 +70,31 @@ type: custom:jules-agent-card
 
 If the API returns nothing (no key yet / API unreachable), the card shows sample data so it still looks and behaves like Jules.
 
+### More panels
+
+Two cards ship with the integration:
+
+- **`custom:jules-agent-card`** — the full multi-panel interface (sessions, chats, statistics).
+- **`custom:jules-stats-card`** — a compact statistics widget (statuses, per-codebase breakdown, latest activity) with the Jules octopus. Add it to any panel or alongside other cards; no extra Lovelace resource is needed — the main card loads it automatically.
+
+```yaml
+type: custom:jules-stats-card
+```
+
+### Square fullscreen layout
+
+Cards inside **Sections** dashboards are locked to the section width. For the full multi-panel layout create a view of type **Panel** (Edit dashboard → Add view → View type **Panel**) and add the `custom:jules-agent-card` there. In YAML:
+
+```yaml
+- type: panel
+  title: Jules
+  cards:
+    - type: custom:jules-agent-card
+      height: calc(100vh - 120px)
+```
+
+The card is capped at ~1180 px wide and centered, so in a panel view it stays compact and square-ish (matching the chat width of the original Jules) instead of stretching into a 16:9 strip. Adjust `height` to taste.
+
 ### Fullscreen view
 
 Cards inside **Sections** dashboards are locked to the section width. To get the full multi-panel layout, create a view of type **Panel** (Edit dashboard → Add view → View type **Panel**) and add the `custom:jules-agent-card` there — it will span the whole screen. In YAML:

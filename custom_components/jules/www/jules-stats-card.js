@@ -84,9 +84,16 @@ class JulesStatsCard extends HTMLElement {
     const max = Math.max(1, ...stats.map((s) => s.n));
     const repoById = {};
     d.sources.forEach((s) => { repoById[s.id] = s; });
+    const findRepo = (sourceId) => {
+      if (!sourceId) return null;
+      if (repoById[sourceId]) return repoById[sourceId];
+      const tail = String(sourceId).split("/").slice(-2).join("/");
+      return d.sources.find((s) => String(s.repo || "").endsWith(tail)) || null;
+    };
     const perRepo = {};
     sessions.forEach((s) => {
-      if (s.source_id) perRepo[s.source_id] = (perRepo[s.source_id] || 0) + 1;
+      const repo = findRepo(s.source_id);
+      if (repo) perRepo[repo.id] = (perRepo[repo.id] || 0) + 1;
     });
     const times = sessions.map((s) => s.updateTime).filter(Boolean).sort();
     const last = times.length ? times[times.length - 1] : "";

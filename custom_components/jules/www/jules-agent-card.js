@@ -246,7 +246,7 @@ class JulesAgentCard extends HTMLElement {
       :host { display: block; }
       .jules-app {
         display: grid; grid-template-columns: 46px minmax(215px, 250px) minmax(280px, 1fr) 272px;
-        gap: 10px; padding: 10px;
+        gap: 10px; padding: 10px; max-width: 1180px; margin: 0 auto;
         background: #131314; color: #e3e3e3;
         font-family: 'Google Sans', Roboto, system-ui, -apple-system, sans-serif;
         height: ${julesEscape(this.config.height || "660px")};
@@ -511,7 +511,7 @@ class JulesAgentCard extends HTMLElement {
         </div>
         <div class="jules-scroll">
           ${shown.map((s) => {
-            const repo = repoById[s.source_id];
+            const repo = this._repoFor(s.source_id, d);
             return `
             <div class="jules-row ${this._chatSession && this._chatSession.id === s.id ? "sel" : ""}"
                  data-session="${julesEscape(s.id)}">
@@ -651,6 +651,16 @@ class JulesAgentCard extends HTMLElement {
       </div>`;
   }
 
+  _repoFor(sourceId, d) {
+    if (!sourceId) return null;
+    const exact = d.sources.find((s) => s.id === sourceId);
+    if (exact) return exact;
+    // The API may reference sources as "sources/github/owner/repo" while the
+    // sources list uses "sources/<id>" — match by the trailing owner/repo.
+    const tail = String(sourceId).split("/").slice(-2).join("/");
+    return d.sources.find((s) => String(s.repo || "").endsWith(tail)) || null;
+  }
+
   _statsPanelHtml(d) {
     const sessions = d.sessions;
     const count = (pred) => sessions.filter(pred).length;
@@ -665,7 +675,8 @@ class JulesAgentCard extends HTMLElement {
     const max = Math.max(1, ...stats.map((s) => s.n));
     const perRepo = {};
     sessions.forEach((s) => {
-      if (s.source_id) perRepo[s.source_id] = (perRepo[s.source_id] || 0) + 1;
+      const repo = this._repoFor(s.source_id, d);
+      if (repo) perRepo[repo.id] = (perRepo[repo.id] || 0) + 1;
     });
     const repoById = {};
     d.sources.forEach((s) => { repoById[s.id] = s; });
@@ -695,7 +706,7 @@ class JulesAgentCard extends HTMLElement {
           }).join("")}
           <div class="jules-sec">Latest activity</div>
           <div class="jules-stat">
-            <div class="l">${this._icon("history", 14)}<span>${last ? julesEscape(julesRelTime(last)) : "—"}</span></div>
+            <div class="l">${this._icon("history", 14)}<span>${last ? (julesRelTime(last) || "—") : "—"}</span></div>
           </div>
         </div>
       </div>
