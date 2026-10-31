@@ -72,6 +72,14 @@ function julesRelTime(iso) {
   return `${months} month${months === 1 ? "" : "s"} ago`;
 }
 
+function julesMd(text) {
+  let html = julesEscape(text);
+  html = html.replace(/^#{1,4} (.*)$/gm, "<b>$1</b>");
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  html = html.replace(/`([^`]+)`/g, '<code class="md-code">$1</code>');
+  return html;
+}
+
 class JulesAgentCard extends HTMLElement {
   constructor() {
     super();
@@ -82,6 +90,7 @@ class JulesAgentCard extends HTMLElement {
     this._schedOpen = true;
     this._menuFor = null;
     this._menuSession = null;
+    this._expanded = new Set();
     this._renderKey = "";
     this._focus = null;
     this._ro = null;
@@ -167,6 +176,7 @@ class JulesAgentCard extends HTMLElement {
 
   _openChat(session) {
     this._menuFor = null;
+    this._expanded = new Set();
     this._chatSession = { id: session.id, title: session.title };
     if (!this._isSample(session.id) && this._hass && this._hass.callService) {
       this._hass.callService("jules", "load_chat", { session_id: session.id });
@@ -176,8 +186,7 @@ class JulesAgentCard extends HTMLElement {
 
   _closeChat() {
     this._chatSession = null;
-    this._pending = [];
-    this._chatDraft = "";
+    this._expanded = new Set();
     this._render();
   }
 
@@ -220,6 +229,7 @@ class JulesAgentCard extends HTMLElement {
       ${this._chatPanelHtml(d)}
       <div class="jules-right">
         ${this._statsPanelHtml(d)}
+        ${this._overviewPanelHtml(d)}
       </div>
     `;
 
@@ -442,6 +452,13 @@ class JulesAgentCard extends HTMLElement {
       .jules-review .rv-btn:hover { background: #fff; }
       .jules-review .rv-thumbs { margin-left: auto; display: flex; align-items: center; gap: 8px;
         color: #9aa0a6; font-size: 12px; cursor: pointer; }
+      .bubble.md .full { display: none; }
+      .bubble.md.expanded .full { display: block; }
+      .bubble.md.expanded .short { display: none; }
+      .md-code { background: #26272a; border-radius: 4px; padding: 1px 6px; font-family: monospace;
+        font-size: 12px; color: #c4c7c5; }
+      .showmore { color: #8ab4f8; font-size: 12px; cursor: pointer; align-self: flex-end; }
+      .showmore:hover { text-decoration: underline; }
     `;
   }
 
@@ -590,6 +607,7 @@ class JulesAgentCard extends HTMLElement {
                 m,
                 m.kind === "changes" && !all.slice(i + 1).some((x) => x.kind === "changes"),
                 d,
+                i,
               )).join("") : `
               <div class="jules-empty">${real && !loaded ? "Loading chat..." : "No messages yet"}</div>`}
           </div>
@@ -599,7 +617,7 @@ class JulesAgentCard extends HTMLElement {
     `;
   }
 
-  _messageHtml(m, isLast, d) {
+  _messageHtml(m, isLast, d, idx) {
     if (m.kind === "plan") {
       const steps = String(m.text).split("\n").map((s) => s.replace(/^\s*\d+\.\s*/, ""));
       return `
@@ -641,13 +659,22 @@ class JulesAgentCard extends HTMLElement {
           <ha-icon class="chev" icon="mdi:chevron-down" style="--mdc-icon-size:16px;"></ha-icon>
         </div></div>`;
     }
-    if (m.role === "user") {
-      return `<div class="jules-msg user"><div class="bubble">${julesEscape(m.text)}</div></div>`;
+    const key = `${d.chat.id || "s"}:${idx}`;
+    const long = String(m.text || "").length > 700;
+    const expanded = this._expanded.has(key);
+    const isUser = m.role === "user";
+    const wrap = (inner) => `<div class="jules-msg${isUser ? " user" : ""}">${inner}</div>`;
+    if (long) {
+      const collapsed = `<div class="bubble md ${expanded ? "expanded" : ""}"><div class="short">${julesMd(String(m.text).slice(0, 700))} …</div><div class="full">${julesMd(m.text)}</div></div>`;
+      const toggle = `<span class="showmore" data-showmore="${julesEscape(key)}">${expanded ? "Show less" : "Show more"}</span>`;
+      return wrap(collapsed) + wrap(toggle);
     }
+    const bubble = `<div class="bubble">${julesMd(m.text)}</div>`;
+    if (isUser) return wrap(bubble);
     return `
       <div class="jules-msg">
         <div class="av">${this._icon("octopus", 19)}</div>
-        <div class="bubble">${julesEscape(m.text)}</div>
+        ${bubble}
       </div>`;
   }
 
@@ -659,6 +686,34 @@ class JulesAgentCard extends HTMLElement {
     // sources list uses "sources/<id>" — match by the trailing owner/repo.
     const tail = String(sourceId).split("/").slice(-2).join("/");
     return d.sources.find((s) => String(s.repo || "").endsWith(tail)) || null;
+  }
+
+  _overviewPanelHtml(d) {
+    const sessions = d.sessions.slice()
+      .sort((a, b) => String(b.updateTime || "").localeCompare(String(a.updateTime || "")));
+    const waiting = sessions.filter((s) => ["AWAITING_YOUR_INPUT", "AWAITING_USER_FEEDBACK"].includes(s.state));
+    return `
+      <div class="jules-panel">
+        <div class="jules-panel-head"><span class="t">Overview</span></div>
+        <div class="jules-scroll">
+          ${waiting.length ? `
+            <div class="jules-sec">Needs attention</div>
+            ${waiting.slice(0, 4).map((s) => `
+              <div class="jules-row" data-session="${julesEscape(s.id)}" title="${julesEscape(s.title)}">
+                ${this._icon("alert-circle-outline", 14)}
+                <div class="t"><div class="ttl">${julesEscape(s.title)}</div></div>
+              </div>`).join("")}` : ""}
+          <div class="jules-sec">Recent</div>
+          ${sessions.slice(0, 5).map((s) => `
+            <div class="jules-row" data-session="${julesEscape(s.id)}" title="${julesEscape(s.title)}">
+              ${this._stateIcon(s.state, 13)}
+              <div class="t">
+                <div class="ttl">${julesEscape(s.title)}</div>
+                <div class="sub">${julesEscape(this._stateText(s.state))}</div>
+              </div>
+            </div>`).join("")}
+        </div>
+      </div>`;
   }
 
   _statsPanelHtml(d) {
@@ -751,6 +806,18 @@ class JulesAgentCard extends HTMLElement {
   _handleClick(ev) {
     const d = this._data();
     const t = ev.target;
+
+    const showmore = t.closest("[data-showmore]");
+    if (showmore) {
+      const msgWrap = showmore.closest(".jules-msg");
+      const bubble = msgWrap && msgWrap.previousElementSibling
+        ? msgWrap.previousElementSibling.querySelector(".bubble.md") : null;
+      if (bubble) {
+        bubble.classList.toggle("expanded");
+        showmore.textContent = bubble.classList.contains("expanded") ? "Show less" : "Show more";
+      }
+      return;
+    }
 
     const mcpEl = t.closest(".jules-mcp");
     if (mcpEl) {

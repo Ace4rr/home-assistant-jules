@@ -149,6 +149,20 @@ class JulesApiClient:
                         {"role": "user" if originator == "user" else "jules", "kind": "message", "text": text}
                     )
 
+            elif "agentMessaged" in item:
+                am = item.get("agentMessaged")
+                text = am.get("agentMessage") if isinstance(am, dict) else str(am or "")
+                text = str(text or "").strip()
+                if text:
+                    messages.append({"role": "jules", "kind": "message", "text": text})
+
+            elif "userMessaged" in item:
+                um = item.get("userMessaged")
+                text = um.get("userMessage") if isinstance(um, dict) else str(um or "")
+                text = str(text or "").strip()
+                if text:
+                    messages.append({"role": "user", "kind": "message", "text": text})
+
             elif "userInput" in item:
                 ui = item.get("userInput")
                 if isinstance(ui, str):
