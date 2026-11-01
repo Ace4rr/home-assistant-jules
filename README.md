@@ -1,6 +1,6 @@
 # Jules Agent
 
-[![GitHub Release](https://img.shields.io/github/v/release/Ace4rr/home-assistant-jules?style=for-the-badge)](https://github.com/Ace4rr/home-assistant-jules/releases/tag/v0.0.1)
+[![GitHub Release](https://img.shields.io/github/v/release/Ace4rr/home-assistant-jules?style=for-the-badge)](https://github.com/Ace4rr/home-assistant-jules/releases/latest)
 [![License](https://img.shields.io/github/license/Ace4rr/home-assistant-jules?style=for-the-badge)](LICENSE)
 
 [![hacs](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://hacs.xyz/docs/faq/custom_repositories)
@@ -21,6 +21,7 @@ Supported Features:
 ### Recommended: [HACS](https://www.hacs.xyz)
 
 1. Add this repository as a custom repository to HACS: [![Add Repository](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Ace4rr&repository=home-assistant-jules&category=integration)
+   If the button doesn't work ("My Home Assistant" link not configured on your instance), add it manually: **HACS** → three-dots menu (top right) → **Custom repositories** → paste `https://github.com/Ace4rr/home-assistant-jules`, category **Integration**.
 2. Use HACS to install the integration.
 3. Restart Home Assistant.
 4. Set up the integration using the UI: [![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=jules)
