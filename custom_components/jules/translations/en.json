@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Jules Agent",
+        "description": "Set up the Jules Agent integration.",
+        "data": {
+          "api_url": "Jules API URL",
+          "api_token": "API Token"
+        }
+      }
+    },
+    "error": {
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "Jules Agent is already configured."
+    }
+  }
+}
