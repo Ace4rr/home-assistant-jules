@@ -134,7 +134,7 @@ class JulesStatsCard extends HTMLElement {
             <div class="barwrap"><div class="bar" style="width:${Math.round((s.n / max) * 100)}%;background:${s.color}"></div></div>
             <span class="n">${s.n}</span>
           </div>`).join("") : `
-          <div class="jsc-empty">Нет данных — проверьте Jules API</div>`}
+          <div class="jsc-empty">No data — check Jules API</div>`}
         ${Object.keys(perRepo).length ? `
           <div class="jsc-sec">By codebase</div>
           ${Object.entries(perRepo).sort((a, b) => b[1] - a[1]).map(([srcId, n]) => {

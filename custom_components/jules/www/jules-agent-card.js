@@ -514,7 +514,7 @@ class JulesAgentCard extends HTMLElement {
         <div class="jules-panel-head">
           <span class="t">Sessions</span>
           <span class="cnt">${d.sessions.length}</span>
-          <span class="jules-iconbtn" data-action="refresh" title="Обновить">${this._icon("refresh", 16)}</span>
+          <span class="jules-iconbtn" data-action="refresh" title="Refresh">${this._icon("refresh", 16)}</span>
         </div>
         <div class="jules-search">
           <input data-focus="search" placeholder="Search sessions" value="${julesEscape(this._search)}">
@@ -570,14 +570,14 @@ class JulesAgentCard extends HTMLElement {
           <span class="gh">${GH_SVG}</span>
           <span class="t" title="${julesEscape(this._chatSession.title)}">${julesEscape(repo ? repo.repo + " — " : "")}${julesEscape(this._chatSession.title)}</span>
           ${real ? "" : '<span class="jules-badge">demo</span>'}
-          <span class="jules-iconbtn" data-action="open-jules" title="Открыть в Jules">${this._icon("open-in-new", 15)}</span>
-          <span class="x" data-action="close-chat" title="Закрыть чат">${this._icon("close", 16)}</span>
+          <span class="jules-iconbtn" data-action="open-jules" title="Open in Jules">${this._icon("open-in-new", 15)}</span>
+          <span class="x" data-action="close-chat" title="Close chat">${this._icon("close", 16)}</span>
         </div>
         <div class="jp-chat-scroll">
           ${d.chat.error && real && loaded ? `
             <div class="jules-banner err">
               ${this._icon("alert-circle-outline", 15)}
-              <span class="t">Не удалось загрузить чат: ${julesEscape(d.chat.error)}</span>
+              <span class="t">Failed to load chat: ${julesEscape(d.chat.error)}</span>
             </div>` : ""}
           ${waiting ? `
             <div class="jules-banner">
@@ -609,7 +609,7 @@ class JulesAgentCard extends HTMLElement {
     }
     if (m.kind === "changes") {
       const files = Array.isArray(m.files) && m.files.length ? m.files
-        : String(m.text || "").replace("Изменения кода: ", "").split(", ").filter(Boolean);
+        : String(m.text || "").replace("Code changes: ", "").split(", ").filter(Boolean);
       const chips = files.map((f) => `<span class="file-chip">${julesEscape(f)}</span>`).join(" ");
       if (isLast) {
         const shortId = String(this._chatSession.id || "").replace(/^.*\//, "");
@@ -622,7 +622,7 @@ class JulesAgentCard extends HTMLElement {
           ${d.chat.branch ? `<div class="rv-branch">⑂ ${julesEscape(d.chat.branch)}</div>` : ""}
           <div class="rv-actions">
             <a class="rv-btn" href="${julesEscape(pr)}" target="_blank" rel="noopener">View PR</a>
-            <span class="rv-thumbs" data-action="open-jules" title="Оценить в Jules">How'd Jules do? ${this._icon("thumb-up-outline", 15)} ${this._icon("thumb-down-outline", 15)}</span>
+            <span class="rv-thumbs" data-action="open-jules" title="Rate in Jules">How'd Jules do? ${this._icon("thumb-up-outline", 15)} ${this._icon("thumb-down-outline", 15)}</span>
           </div>
         </div></div>`;
       }
@@ -636,7 +636,7 @@ class JulesAgentCard extends HTMLElement {
     }
     if (m.kind === "mcp") {
       return `
-        <div class="jules-msg"><div class="jules-mcp" title="Подробнее в Jules">
+        <div class="jules-msg"><div class="jules-mcp" title="Details in Jules">
           ${this._icon("account-convert-outline", 16)} <span class="k">MCP Call</span> <b>${julesEscape(String(m.text).replace(/^MCP Call\s*/, ""))}</b>
           <ha-icon class="chev" icon="mdi:chevron-down" style="--mdc-icon-size:16px;"></ha-icon>
         </div></div>`;
@@ -763,9 +763,9 @@ class JulesAgentCard extends HTMLElement {
     wrap.innerHTML = `
       <div class="jules-backdrop" data-action="close-menu"></div>
       <div class="jules-menu" style="left:${left}px;top:${r.bottom + 6}px">
-        <div class="jules-menu-item" data-maction="chat">Открыть чат</div>
-        <div class="jules-menu-item" data-maction="openjules">Открыть в Jules</div>
-        <div class="jules-menu-item" data-maction="refresh">Обновить данные</div>
+        <div class="jules-menu-item" data-maction="chat">Open chat</div>
+        <div class="jules-menu-item" data-maction="openjules">Open in Jules</div>
+        <div class="jules-menu-item" data-maction="refresh">Refresh data</div>
       </div>
     `;
     while (wrap.firstChild) this.card.appendChild(wrap.firstChild);

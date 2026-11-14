@@ -98,7 +98,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         else:
             error = None
             if not messages:
-                error = "API вернул пустую историю (HTTP 200) — детали в логах HA, фильтр 'jules'"
+                error = "API returned empty history (HTTP 200) — check HA logs for 'jules'"
         branch = pr_url = None
         try:
             detail = await client.get_session(session_id)
