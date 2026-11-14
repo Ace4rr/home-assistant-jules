@@ -18,11 +18,6 @@ const SAMPLE_SESSIONS = [
   { id: "sample/s7", title: "Привет там указано про то что надо добавить сущность", state: "PAUSED", updateTime: "", source_id: "sample/src-ha" },
 ];
 
-const SAMPLE_SCHEDULED = [
-  { title: "Допиливание ReadMe чтобы оно точно соответствовало проекту - фигня с Licenses", when: "Once on 2026-10-30 at 03:00 AM" },
-  { title: "Напиши readme по типу как в https://github.com/meshtastic/home-assistant", when: "Once on 2026-10-26 at 11:30 AM" },
-];
-
 const SAMPLE_CHATS = [
   [
     { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск npm run start успешно проходят локально." },
@@ -87,7 +82,6 @@ class JulesAgentCard extends HTMLElement {
     this._chatSession = null;
     this._search = "";
     this._sessionsExpanded = false;
-    this._schedOpen = true;
     this._menuFor = null;
     this._menuSession = null;
     this._expanded = new Set();
@@ -166,7 +160,7 @@ class JulesAgentCard extends HTMLElement {
       d.sources.map((s) => [s.id, s.title]),
       c ? c.state : null, d.chat.messages.length,
       this._chatSession, this._menuFor, this._search,
-      this._sessionsExpanded, this._schedOpen,
+      this._sessionsExpanded,
     ]);
   }
 
@@ -544,18 +538,6 @@ class JulesAgentCard extends HTMLElement {
             <div class="jules-row jules-viewmore" data-action="viewmore">
               ${this._icon(this._sessionsExpanded ? "minus" : "plus", 15)}<span class="t">${this._sessionsExpanded ? "View less" : "View more"}</span>
             </div>` : ""}
-          <div class="jules-sec" data-action="toggle-sched">
-            <span>Scheduled</span>
-            ${this._icon(this._schedOpen ? "chevron-up" : "chevron-down", 16)}
-          </div>
-          ${this._schedOpen ? SAMPLE_SCHEDULED.map((s) => `
-            <div class="jules-row" data-scheduled title="Открыть в Jules">
-              ${this._icon("clock-outline", 15)}
-              <div class="t">
-                <div class="ttl" title="${julesEscape(s.title)}">${julesEscape(s.title)}</div>
-                <div class="sub">${this._icon("chevron-right", 12)} ${julesEscape(s.when)}</div>
-              </div>
-            </div>`).join("") : ""}
         </div>
       </div>
     `;
@@ -851,9 +833,6 @@ class JulesAgentCard extends HTMLElement {
       if (action === "viewmore") {
         this._sessionsExpanded = !this._sessionsExpanded;
         this._render();
-      } else if (action === "toggle-sched") {
-        this._schedOpen = !this._schedOpen;
-        this._render();
       } else if (action === "close-chat") {
         this._closeChat();
       } else if (action === "refresh") {
@@ -872,11 +851,6 @@ class JulesAgentCard extends HTMLElement {
       const session = d.sessions.find((s) => s.id === sessEl.dataset.session);
       if (session) this._openChat(session);
       return;
-    }
-
-    const schedEl = t.closest("[data-scheduled]");
-    if (schedEl) {
-      window.open(this.config.url, "_blank");
     }
   }
 
