@@ -246,7 +246,7 @@ class JulesApiClient:
             if m.get("kind") == "changes":
                 if not m.get("files"):
                     continue
-                m["text"] = "Изменения кода: " + ", ".join(m["files"][:6])
+                m["text"] = "Code changes: " + ", ".join(m["files"][:6])
             result.append(m)
 
         if not result and isinstance(data, dict) and data.get("activities"):

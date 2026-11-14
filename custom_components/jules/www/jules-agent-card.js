@@ -2,44 +2,43 @@
 import("/jules_local/jules-stats-card.js").catch(() => {});
 
 const SAMPLE_SOURCES = [
-  { id: "sample/src-al", title: "Ace4rr/AL_Challenge_Banking-PSBxMAI", repo: "Ace4rr/AL_Challenge_Banking-PSBxMAI", branch: "main" },
-  { id: "sample/src-ha", title: "Ace4rr/home-assistant-jules", repo: "Ace4rr/home-assistant-jules", branch: "main" },
-  { id: "sample/src-rover", title: "Ace4rr/Rover_0", repo: "Ace4rr/Rover_0", branch: "main" },
-  { id: "sample/src-tw", title: "Ace4rr/Twitch-CS2-case-opener", repo: "Ace4rr/Twitch-CS2-case-opener", branch: "main" },
+  { id: "sample/src-ha", title: "example/home-assistant-config", repo: "example/home-assistant-config", branch: "main" },
+  { id: "sample/src-core", title: "example/core-integration", repo: "example/core-integration", branch: "main" },
+  { id: "sample/src-frontend", title: "example/frontend-dashboard", repo: "example/frontend-dashboard", branch: "main" },
 ];
 
 const SAMPLE_SESSIONS = [
-  { id: "sample/s1", title: "Допиливание ReadMe чтобы оно точно соответствовало проекту", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
-  { id: "sample/s2", title: "Замена Bun на лего-весний аналог", state: "AWAITING_YOUR_INPUT", updateTime: "", source_id: "sample/src-tw" },
-  { id: "sample/s3", title: "Ошибка custom element: jules-agent-card в Home Assistant", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
+  { id: "sample/s1", title: "Update project documentation and setup guide", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
+  { id: "sample/s2", title: "Migrate build scripts to lightweight npm runner", state: "AWAITING_YOUR_INPUT", updateTime: "", source_id: "sample/src-frontend" },
+  { id: "sample/s3", title: "Fix custom element registration in Home Assistant", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
   { id: "sample/s4", title: "Fix register_static_path AttributeError in Jules Agent", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
-  { id: "sample/s5", title: "Docker Compose файл для запуска инструмента", state: "COMPLETED", updateTime: "", source_id: "sample/src-ha" },
-  { id: "sample/s6", title: "Рефакторизация и профессиональное оформление", state: "IN_PROGRESS", updateTime: "", source_id: "sample/src-ha" },
-  { id: "sample/s7", title: "Привет там указано про то что надо добавить сущность", state: "PAUSED", updateTime: "", source_id: "sample/src-ha" },
+  { id: "sample/s5", title: "Add Docker Compose configuration for runner", state: "COMPLETED", updateTime: "", source_id: "sample/src-core" },
+  { id: "sample/s6", title: "Refactor coordinator and clean up entity states", state: "IN_PROGRESS", updateTime: "", source_id: "sample/src-core" },
+  { id: "sample/s7", title: "Configure sensor availability tracking", state: "PAUSED", updateTime: "", source_id: "sample/src-ha" },
 ];
 
 const SAMPLE_CHATS = [
   [
-    { role: "jules", kind: "message", text: "Все изменения закоммичены. Я перевел проект с bun на npm, как вы и просили:\n\n1. Заменил bun на npm (включая команды, bun.lock удалён, добавлен package-lock.json).\n2. Отредактировал скрипты на использование стандартного CLI вместо bun:sqllite и обновил конфигурацию ESLint.\n3. Переписал Dockerfile для использования node:20-alpine и npm.\n4. Обновил документацию (README, GuideView).\n5. Тестовая сборка npm run build и запуск npm run start успешно проходят локально." },
-    { role: "user", kind: "message", text: "Могу ли я считать эту задачу успешно завершенной?" },
-    { role: "jules", kind: "message", text: "Да, задача выполнена. Все изменения закоммичены в текущей ветке (jules-6624644291350414200-a471c40f)." },
-    { role: "user", kind: "message", text: "Сделай pull request, я смерджу и тогда да" },
-    { role: "jules", kind: "message", text: "Я отправил изменения в репозиторий. Пожалуйста, создайте Pull Request из ветки jules-6624644291350414200-a471c40f в main. Как только вы его смерджите, дайте мне знать, и я завершу задачу." },
+    { role: "jules", kind: "message", text: "All changes are committed. I migrated the project from bun to npm as requested:\n\n1. Replaced bun with npm (commands updated, bun.lock removed, package-lock.json added).\n2. Updated CLI scripts and ESLint configuration.\n3. Updated Dockerfile to use node:20-alpine.\n4. Updated documentation.\n5. Verified that npm run build and npm run test pass cleanly." },
+    { role: "user", kind: "message", text: "Can we consider this task completed?" },
+    { role: "jules", kind: "message", text: "Yes, the task is complete. All changes are committed to the feature branch (jules-6624644291350414200-a471c40f)." },
+    { role: "user", kind: "message", text: "Create a pull request, I will merge it." },
+    { role: "jules", kind: "message", text: "I have submitted the pull request from branch jules-6624644291350414200-a471c40f into main. Once you review and merge it, let me know to close the session." },
     { role: "jules", kind: "mcp", text: "MCP Call  connect  Render" },
-    { role: "jules", kind: "message", text: "Я отправил пуш и запрос на создание пулл-реквеста через специальный внутренний API. Проверьте, пожалуйста, появился ли pull-реквест в вашем репозитории." },
+    { role: "jules", kind: "message", text: "Pull request created successfully. Please check your repository." },
   ],
   [
-    { role: "user", kind: "message", text: "Проверь, почему сенсор показывает unavailable после рестарта HA." },
-    { role: "jules", kind: "message", text: "Разобрался: сущность создавалась до первого успешного ответа API. Я добавил состояние «unknown» до получения данных и повторную попытку настройки через 30 секунд.\n\nИзменения закоммичены в ветке jules-fix-sensor-state." },
-    { role: "user", kind: "message", text: "Отлично, добавь тест на этот кейс" },
-    { role: "jules", kind: "message", text: "Добавил тест test_sensor_unavailable_before_first_refresh. Все 7 тестов проходят. Нужен ли pull request?" },
+    { role: "user", kind: "message", text: "Check why the sensor shows unavailable after Home Assistant restart." },
+    { role: "jules", kind: "message", text: "Identified the issue: the entity was registered before the first successful API response. I added an 'unknown' state fallback and a retry schedule.\n\nChanges committed in branch jules-fix-sensor-state." },
+    { role: "user", kind: "message", text: "Great, please add a unit test for this case." },
+    { role: "jules", kind: "message", text: "Added test_sensor_unavailable_before_first_refresh. All tests are passing now. Should I create a pull request?" },
   ],
   [
-    { role: "user", kind: "message", text: "Собери README в стиле Meshtastic: бейджи, скриншоты, таблица параметров." },
-    { role: "jules", kind: "message", text: "Готово. Обновил README: добавил бейджи HACS/релиза, таблицу сущностей и сервисов, раздел устранения неполадок.\n\nПросьба посмотреть и подтвердить." },
+    { role: "user", kind: "message", text: "Update the README: badges, entities table, and troubleshooting section." },
+    { role: "jules", kind: "message", text: "Done. Updated README: added HACS/release badges, services table, and troubleshooting guide.\n\nPlease review and confirm." },
     { role: "jules", kind: "mcp", text: "MCP Call  push_files  github" },
-    { role: "user", kind: "message", text: "Выглядит хорошо, мержу" },
-    { role: "jules", kind: "message", text: "Принял, задачу закрываю." },
+    { role: "user", kind: "message", text: "Looks great, merging." },
+    { role: "jules", kind: "message", text: "Understood, closing the task." },
   ],
 ];
 
@@ -281,6 +280,11 @@ class JulesAgentCard extends HTMLElement {
       }
       .jules-panel-head .t { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
       .jules-panel-head .cnt { background: #3c4043; border-radius: 10px; font-size: 11px; padding: 1px 8px; color: #c4c7c5; }
+      .jules-badge {
+        background: #715cd7; color: #fff; font-size: 10px; font-weight: 600;
+        padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
       .jules-panel-head .x {
         display: flex; align-items: center; justify-content: center;
         width: 28px; height: 28px; border-radius: 50%; color: #9aa0a6; cursor: pointer; flex: none;
@@ -512,7 +516,7 @@ class JulesAgentCard extends HTMLElement {
     return `
       <div class="jules-panel">
         <div class="jules-panel-head">
-          <span class="t">Sessions</span>
+          <span class="t">${this._isSample(d.sessions[0]?.id) ? "Sessions (Demo)" : "Sessions"}</span>
           <span class="cnt">${d.sessions.length}</span>
           <span class="jules-iconbtn" data-action="refresh" title="Refresh">${this._icon("refresh", 16)}</span>
         </div>
